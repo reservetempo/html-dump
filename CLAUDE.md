@@ -11,7 +11,7 @@ Every idea is made from scratch. Unless the user explicitly names an earlier ide
 - Do not base an idea's design on the home page (`index.html`) either.
 - When the user does name an earlier idea, read only that one.
 
-Editing an existing idea (when asked) means working on that idea's folder only.
+Editing an existing idea (when asked) means working on that idea's folder only. Push those edits right away too.
 
 ## Adding a new idea
 
@@ -25,7 +25,7 @@ Editing an existing idea (when asked) means working on that idea's folder only.
    Optional: `<meta name="date" content="YYYY-MM-DD">` overrides the listed date (default: the date the file was first committed).
 4. Don't edit `index.html` to add the idea. `scripts/build.mjs` builds the list on deploy.
 5. Preview with the `site` config in `.claude/launch.json` (runs `node scripts/serve.mjs`: builds, then serves `_site/` at http://localhost:8080). Re-run it to pick up changes to the home page list.
-6. Commit and push to `main` when the user asks. `.github/workflows/deploy.yml` deploys in about a minute; the idea is live at `https://reservetempo.github.io/html-dump/ideas/<slug>/`.
+6. When the idea is done, commit it and push to `main` right away, without asking. The user wants new ideas published as soon as they're made. Commit only that idea's folder. `.github/workflows/deploy.yml` deploys in about a minute; the idea is live at `https://reservetempo.github.io/html-dump/ideas/<slug>/`. Give the user that link.
 
 ## Layout
 
