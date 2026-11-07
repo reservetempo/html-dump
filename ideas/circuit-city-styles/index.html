@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Circuit City: style reference board</title>
+<meta name="description" content="A visual reference board for a city builder that teaches computer architecture: eleven city-builder art styles, the buildings they use, and how roads, depots and districts could stand in for gates, adders and an ALU.">
+<meta name="date" content="2026-11-07">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3efe4; --card:#fbf9f3; --ink:#1c2230; --muted:#5a6070; --line:#d8d1bf; --grid:rgba(28,34,48,.06);
+  --asphalt:#2a2f38; --lane:#f2c230;
+  --res:#22703a; --com:#2c66b0; --ind:#b9790c; --ind-text:#845400; --util:#7a4bb5; --civ:#b23a3a;
+  --res-bg:#e2f0e3; --com-bg:#e1eaf6; --ind-bg:#f6ead2; --util-bg:#ece3f6; --civ-bg:#f6e0dd;
+  --shadow:0 1px 0 rgba(0,0,0,.04),0 6px 18px -10px rgba(28,34,48,.35);
+  --sans:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#13171e; --card:#1a1f28; --ink:#e8e3d6; --muted:#a2a7b3; --line:#2f3643; --grid:rgba(232,227,214,.05);
+    --asphalt:#0c0f14; --lane:#e6b62a;
+    --res:#6cc884; --com:#79a8ea; --ind:#e7b04a; --ind-text:#e7b04a; --util:#b896ea; --civ:#ec8378;
+    --res-bg:#1b2c21; --com-bg:#1a2536; --ind-bg:#2e2615; --util-bg:#251d33; --civ-bg:#331d1b;
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 8px 20px -12px rgba(0,0,0,.8);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--sans);font-stretch:100%}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--com);text-underline-offset:2px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--lane);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.prose{max-width:70ch}
+h1,h2,h3{line-height:1.15;margin:0}
+h2{font-size:clamp(1.6rem,3.2vw,2.2rem);font-weight:800;font-stretch:112%;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:700;font-stretch:105%}
+p{margin:.6em 0}
+.mono,.kicker,.tag,figcaption,.pip-row,th,.src-n{font-family:var(--mono)}
+.kicker{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+sup.c{font-family:var(--mono);font-size:.7em;line-height:0}
+sup.c a{text-decoration:none;padding:0 1px}
+
+/* header: a road */
+header.top{background:
+  linear-gradient(var(--grid) 1px,transparent 1px) 0 0/28px 28px,
+  linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/28px 28px;
+  padding:48px 0 0}
+header.top h1{font-size:clamp(2.6rem,9vw,6rem);font-weight:800;font-stretch:125%;letter-spacing:-.02em;line-height:.95}
+header.top h1 span{display:block;font-size:.34em;font-stretch:100%;font-weight:600;letter-spacing:0;color:var(--muted);margin-top:.5em;line-height:1.25}
+.road{margin-top:36px;height:46px;background:var(--asphalt);position:relative;overflow:hidden}
+.road::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;
+  background:repeating-linear-gradient(90deg,var(--lane) 0 34px,transparent 34px 60px)}
+.road .car{position:absolute;top:8px;width:26px;height:12px;border-radius:3px;background:var(--res);animation:drive 9s linear infinite}
+.road .car.b{top:27px;background:var(--com);animation-duration:12s;animation-direction:reverse;animation-delay:-4s}
+.road .car.c{background:var(--ind);animation-delay:-5s}
+@keyframes drive{from{transform:translateX(-40px)}to{transform:translateX(1400px)}}
+@media (prefers-reduced-motion:reduce){.road .car{animation:none}.road .car{left:20%}.road .car.b{left:55%}.road .car.c{left:80%}}
+
+/* bottom line */
+.permit{margin:36px 0 8px;border:2px solid var(--ink);background:var(--card);padding:22px 24px;box-shadow:var(--shadow);max-width:880px}
+.permit .kicker{color:var(--ink)}
+.permit ul{margin:.6em 0 0;padding-left:1.1em}
+.permit li{margin:.45em 0}
+.permit .conf{font-family:var(--mono);font-size:.8rem;color:var(--muted);margin-top:12px}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;list-style:none}
+nav.toc a{display:inline-block;font:500 .82rem var(--mono);padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--ink);text-decoration:none;background:var(--card)}
+nav.toc a:hover{border-color:var(--ink)}
+
+section{padding:64px 0 8px}
+.sec-head{display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:18px}
+.sec-head .kicker{flex:none}
+
+/* filter bar */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 22px}
+.filters .lbl{font:500 .78rem var(--mono);color:var(--muted);margin-right:2px}
+.chip{font:500 .82rem var(--mono);padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.count{font:.8rem var(--mono);color:var(--muted);margin-left:auto}
+
+/* style cards */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:22px}
+.style{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.style[hidden]{display:none}
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--line)}
+.shots figure{margin:0;position:relative;background:var(--asphalt)}
+.shots figure:first-child{grid-column:1/-1}
+.shots button{all:unset;cursor:zoom-in;display:block;width:100%}
+.shots button:focus-visible{outline:3px solid var(--lane);outline-offset:-3px}
+.shots img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.shots figcaption{position:absolute;left:0;bottom:0;font-size:.68rem;line-height:1.2;padding:3px 6px;background:rgba(12,15,20,.78);color:#f3efe4;max-width:100%}
+.style .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.style .num{font:600 .75rem var(--mono);color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:.7rem;padding:2px 7px;border-radius:3px;background:var(--com-bg);color:var(--com);font-weight:500}
+.style dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.92rem}
+.style dt{font:500 .72rem/1.9 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.style dd{margin:0}
+.pip-row{display:flex;gap:14px;flex-wrap:wrap;font-size:.75rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:auto}
+.pips{display:inline-flex;gap:3px;vertical-align:middle;margin-left:4px}
+.pips i{width:10px;height:10px;border-radius:2px;border:1.5px solid var(--ind);display:block}
+.pips i.on{background:var(--ind)}
+.refs{font-size:.84rem;color:var(--muted)}
+.note{font-size:.9rem}
+
+/* prior art */
+.prior{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-top:20px}
+.prior figure{margin:0;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.prior img{aspect-ratio:16/9;object-fit:cover;width:100%}
+.prior figcaption{padding:10px 12px 12px;font-family:var(--sans);font-size:.88rem;line-height:1.5}
+.prior figcaption b{font-size:1rem;display:block}
+.prior figcaption .by{display:block;font:.72rem var(--mono);color:var(--muted);margin-bottom:4px}
+.closeness{display:inline-block;margin-top:8px;padding:1px 6px;border-radius:3px;font:500 .7rem var(--mono)}
+.close-hi{background:var(--civ-bg);color:var(--civ)}.close-mid{background:var(--ind-bg);color:var(--ind-text)}.close-lo{background:var(--com-bg);color:var(--com)}
+
+/* tables */
+.tbl{overflow-x:auto;margin:18px 0;border:1px solid var(--line);background:var(--card);-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:640px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--paper)}
+tr:last-child td{border-bottom:0}
+td .tag{white-space:nowrap}
+.z-res{background:var(--res-bg);color:var(--res)}.z-com{background:var(--com-bg);color:var(--com)}.z-ind{background:var(--ind-bg);color:var(--ind-text)}.z-util{background:var(--util-bg);color:var(--util)}.z-civ{background:var(--civ-bg);color:var(--civ)}
+
+/* lightbox */
+dialog#lb{border:0;padding:0;max-width:min(1200px,94vw);background:var(--asphalt);color:#f3efe4;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+dialog#lb::backdrop{background:rgba(10,12,16,.82)}
+dialog#lb img{width:100%;height:auto;max-height:80vh;object-fit:contain}
+dialog#lb .bar{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 14px;font:.82rem var(--mono)}
+dialog#lb .bar a{color:var(--lane)}
+dialog#lb button{font:600 .82rem var(--mono);background:transparent;color:#f3efe4;border:1px solid #f3efe4;padding:6px 12px;cursor:pointer}
+
+ul.tight{padding-left:1.1em;margin:.4em 0}
+ul.tight li{margin:.5em 0}
+
+/* building cards */
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin-top:20px}
+.bld{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.bld .shots{display:block}
+.bld .shots figure:first-child{grid-column:auto}
+.bld .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.bld h3{font-size:1.02rem}
+.bld .to{font-weight:700;font-stretch:100%}
+.bld .to::before{content:"→ ";color:var(--muted)}
+.bld .k{font:500 .68rem var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:4px}
+.bld p{margin:0}
+.bld .seen{font-size:.8rem;color:var(--muted);margin-top:auto;padding-top:6px;border-top:1px dashed var(--line)}
+
+/* diagram */
+figure.diagram{margin:22px 0;background:var(--card);border:1px solid var(--line);padding:14px 14px 10px}
+.svg-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.svg-scroll svg{display:block;width:100%;min-width:620px;height:auto}
+figure.diagram figcaption{font-size:.78rem;color:var(--muted);margin-top:8px;line-height:1.5}
+.rd-on{stroke:var(--ind);stroke-width:10;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.rd-off{stroke:var(--line);stroke-width:10;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.bx{fill:var(--paper);stroke:var(--ink);stroke-width:2}
+.dl{fill:var(--ink);font:600 15px var(--sans)}
+.ds{fill:var(--muted);font:12px var(--mono)}
+.tr{fill:var(--ink)}
+.feed{stroke:var(--util);stroke-width:3;stroke-dasharray:6 5;fill:none}
+.node{fill:var(--ink)}
+
+/* signal models */
+.models{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin:16px 0}
+.model{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--ind);padding:14px 16px;font-size:.92rem}
+.model .lt{font:600 .75rem var(--mono);color:var(--ind-text)}
+.model h3{margin:2px 0 6px}
+.model p{margin:.4em 0}
+.model .strain{color:var(--muted);font-size:.86rem}
+
+/* ladder */
+ol.ladder{list-style:none;padding:0;margin:26px 0;position:relative}
+ol.ladder::before{content:"";position:absolute;left:19px;top:6px;bottom:6px;width:12px;background:var(--asphalt)}
+ol.ladder::after{content:"";position:absolute;left:24px;top:6px;bottom:6px;width:2px;background:repeating-linear-gradient(var(--lane) 0 10px,transparent 10px 18px)}
+ol.ladder li{position:relative;padding:0 0 30px 66px;max-width:78ch}
+ol.ladder .lot{position:absolute;left:0;top:0;width:50px;height:50px;display:grid;place-items:center;background:var(--card);border:2px solid var(--ink);font:600 .9rem var(--mono);z-index:1}
+ol.ladder .comp{font:600 .74rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ind-text)}
+ol.ladder h3{margin:2px 0 4px}
+ol.ladder p{margin:.35em 0}
+ol.ladder .teach{font-size:.88rem;color:var(--muted)}
+ol.ladder .teach b{color:var(--ink);font-weight:600}
+
+/* questions */
+ol.qs{list-style:none;padding:0;margin:20px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;counter-reset:q}
+ol.qs li{counter-increment:q;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);padding:16px 18px 16px 62px;position:relative}
+ol.qs li::before{content:counter(q);position:absolute;left:16px;top:14px;font:800 1.9rem/1 var(--sans);font-stretch:125%;color:var(--com)}
+ol.qs h3{font-size:1.04rem;margin-bottom:6px}
+ol.qs p{margin:.35em 0;font-size:.9rem}
+ol.qs .k{font:500 .68rem var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block}
+
+/* sources */
+ol.sources{font-size:.84rem;padding-left:2.4em;margin:16px 0;columns:2 420px;column-gap:40px}
+ol.sources li{margin:0 0 .6em;break-inside:avoid;overflow-wrap:anywhere}
+ol.sources li:target{background:var(--ind-bg);outline:2px solid var(--ind)}
+ol.sources .what{color:var(--muted)}
+
+footer{margin:72px 0 0;padding:28px 0 40px;border-top:2px solid var(--ink);font-size:.85rem;color:var(--muted)}
+@media (max-width:520px){
+  body{font-size:16px}
+  .wrap{padding:0 16px}
+  .board{grid-template-columns:1fr}
+  .permit{padding:18px 16px}
+  .count{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">Style reference board · researched November 2026</p>
+    <h1>Circuit City<span>What a city builder that teaches computer architecture could look like, from the first adder to a working ALU</span></h1>
+    <div class="permit">
+      <p class="kicker">Bottom line</p>
+      <ul>
+        <li><strong>Nobody has shipped this.</strong> Circuit puzzle games (Turing Complete, Nandgame, Chip Builder) go from gates to a CPU with no city. Colony games (Oxygen Not Included, Timberborn) have gate buildings but teach automation, not architecture.<sup class="c"><a href="#s16">16</a>,<a href="#s20">20</a>,<a href="#s30">30</a>,<a href="#s37">37</a></sup></li>
+        <li><strong>Small teams that ship city builders pick minimal or procedural looks:</strong> Mini Metro was made by two people, Islanders by three, and Townscaper by one.<sup class="c"><a href="#s1">1</a>,<a href="#s3">3</a>,<a href="#s5">5</a></sup> The cheapest styles below are transit-map, blueprint, voxel and neon. Low-poly 3D gives the most "city" for the effort (a judgement call, not a measurement).</li>
+        <li><strong>Traffic works as signals with one rule:</strong> the road's state is the bit, and every gate is a depot that sends out its <em>own</em> trucks, powered by the power plant. Travel time then becomes propagation delay you can watch. Every game that added logic also shows it on a separate on/off overlay, so plan one.<sup class="c"><a href="#s16">16</a>,<a href="#s32">32</a>,<a href="#s39">39</a></sup></li>
+        <li><strong>Biggest risk:</strong> existing games already teach this well. The city has to earn its place by making <em>timing</em> and <em>hierarchy</em> easier to see than a schematic does.</li>
+      </ul>
+      <p class="conf">Confidence: medium-high on styles and prior art; medium on the traffic metaphor (the physics is sound, but nobody has tested it as an interface).</p>
+    </div>
+    <nav class="toc" aria-label="On this page">
+      <a href="#styles">Art styles</a><a href="#prior">Closest games</a><a href="#buildings">Buildings ↔ components</a><a href="#traffic">Traffic as signals</a><a href="#ladder">Adder → ALU</a><a href="#risks">Risks</a><a href="#questions">Questions</a><a href="#sources">Sources</a>
+    </nav>
+  </div>
+  <div class="road" aria-hidden="true"><span class="car"></span><span class="car b"></span><span class="car c"></span></div>
+</header>
+
+<main>
+<section id="styles">
+  <div class="wrap">
+    <div class="sec-head"><span class="kicker">Sheet A</span><h2>Eleven art styles city builders use</h2></div>
+    <div class="prose">
+      <p>Each card shows one style family with screenshots from real games (click any image to enlarge). It lists the camera, the look, how a logic gate might read in that style, and a rough production cost for a small team. Build costs are estimates from the research, not quotes. "2D web" means canvas or SVG in a browser. "3D engine" means Godot, Unity or three.js.</p>
+    </div>
+    <div class="filters" role="group" aria-label="Filter styles">
+      <span class="lbl">Camera:</span>
+      <button class="chip" data-cam="all" aria-pressed="true">All</button>
+      <button class="chip" data-cam="top" aria-pressed="false">Top-down 2D</button>
+      <button class="chip" data-cam="iso" aria-pressed="false">Isometric</button>
+      <button class="chip" data-cam="3d" aria-pressed="false">Free 3D</button>
+      <button class="chip" data-cam="side" aria-pressed="false">Side view</button>
+      <span class="lbl" style="margin-left:8px">Budget:</span>
+      <button class="chip" id="cheap" aria-pressed="false">Cheap for a solo dev</button>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+    <div class="board" id="board"></div>
+    <noscript><p>The style cards need JavaScript to display.</p></noscript>
+  </div>
+</section>
+
+<section id="prior">
+  <div class="wrap">
+    <div class="sec-head"><span class="kicker">Sheet B</span><h2>The closest existing games</h2></div>
+    <div class="prose">
+      <p>The research found no shipped city builder that teaches CPU design. The nearest games come from two directions. <strong>Circuit puzzle games</strong> take you from gates to a CPU but have no city. <strong>Colony and factory games</strong> have logic-gate <em>buildings</em> but use them to automate things, not to teach how a computer works.<sup class="c"><a href="#s16">16</a>,<a href="#s17">17</a>,<a href="#s20">20</a></sup></p>
+    </div>
+    <div class="prior" id="prior-grid"></div>
+    <div class="prose">
+      <h3 style="margin-top:28px">Near misses and odd relatives</h3>
+      <ul class="tight">
+        <li><strong>CPU City</strong> (Kyle Jussab, 2024): a Unity student project where a city hides the von Neumann architecture. It's a story-driven quest game rather than a builder, and reports 92% positive playtest feedback.<sup class="c"><a href="#s31">31</a></sup></li>
+        <li><strong>A 4-bit adder in Cities: Skylines</strong> (Dániel Bali, 2019). The bits were power lines being powered or unpowered, not traffic.<sup class="c"><a href="#s32">32</a></sup></li>
+        <li><strong>Gates from trains in OpenTTD</strong> (2005): gates and a ripple-carry adder built from rail signals.<sup class="c"><a href="#s19">19</a></sup></li>
+        <li><strong>Browser-based gate-to-CPU courses</strong> like Nandgame and Digital Logic Sim use a minimal schematic look.<sup class="c"><a href="#s22">22</a>,<a href="#s29">29</a></sup> Rocky's Boots and Robot Odyssey did logic games in the 1980s; Robot Odyssey was later called the hardest computer game ever made.<sup class="c"><a href="#s34">34</a></sup></li>
+        <li><strong>"Silicon City"</strong> is an unrelated traffic sim that only shares the name.<sup class="c"><a href="#s33">33</a></sup> A US patent maps school curriculum topics onto city buildings.<sup class="c"><a href="#s35">35</a></sup></li>
+      </ul>
+      <p>The deep search covered Steam, itch.io and game jams. Confidence that nothing closer exists is medium-high.</p>
+    </div>
+  </div>
+</section>
+
+<section id="buildings">
+  <div class="wrap">
+    <div class="sec-head"><span class="kicker">Sheet C</span><h2>City buildings as computer parts</h2></div>
+    <div class="prose">
+      <p>City builders use a fairly small set of building types. Each card pairs one type with the computer part it fits best when signals are deliveries, plus where the pairing strains. Tag colours follow SimCity-style zoning. Screenshots show games that have that kind of building, not the building itself.</p>
+      <p>These pairings are design proposals from the research, not standard mappings. Buildings standing for code does have precedent: CodeCity draws software classes as buildings and packages as districts,<sup class="c"><a href="#s26">26</a></sup> and close-up photos of chip dies look strikingly like aerial cities.<sup class="c"><a href="#s27">27</a></sup></p>
+    </div>
+    <div class="map" id="map-grid"></div>
+    <p class="prose" style="font-size:.9rem;color:var(--muted);margin-top:18px">Dropped after the deep dive: a <em>toll booth</em> as a gate (it implies the car passes through), and a <em>bus route</em> as the program counter ("bus" already means a group of data wires).</p>
+  </div>
+</section>
+
+<section id="traffic">
+  <div class="wrap">
+    <div class="sec-head"><span class="kicker">Sheet D</span><h2>Traffic and deliveries as signals</h2></div>
+    <div class="prose">
+      <p><strong>The problem.</strong> A car takes one road and is gone once it arrives. A digital signal does neither. It copies itself down every branch (fan-out), and it is a level that stays on, not a packet. Delivery games that added logic all put it on a separate wire layer that shows on/off state: Factorio, shapez and Oxygen Not Included.<sup class="c"><a href="#s16">16</a>,<a href="#s39">39</a>,<a href="#s40">40</a></sup></p>
+      <p><strong>The fix: the depot rule.</strong> Make the road's <em>state</em> the bit. A road with trucks on it is 1; an empty, dark road is 0. The trucks animate that state but are never the data. Every gate is a depot that sends out trucks from its own garage, fed by the power plant. Its input roads only tell it when to send. Real CMOS logic works the same way: the output's energy comes from the supply, and the inputs only sense. This one rule fixes both problems.</p>
+    </div>
+    <figure class="diagram">
+      <div class="svg-scroll">
+      <svg viewBox="0 0 760 345" role="img" aria-labelledby="dg-t dg-d">
+        <title id="dg-t">The depot rule, roundabouts and railway points</title>
+        <desc id="dg-d">Two busy input roads, A and B, lead into an AND depot. The depot takes trucks from its own garage, fed by the power plant, and sends them along its output road. That road reaches a roundabout which copies the traffic to two exits, both busy. Below, a data road reaches railway points, which send traffic down only one of two exits, chosen by a work order from city hall; the other exit stays dark.</desc>
+        <text class="dl" x="30" y="40">Depot + roundabout</text>
+        <rect class="bx" x="250" y="14" width="120" height="40"/>
+        <text class="dl" x="310" y="39" text-anchor="middle">Power plant</text>
+        <line class="feed" x1="310" y1="54" x2="310" y2="100"/>
+        <text class="ds" x="318" y="82">garage feed</text>
+        <line class="rd-on" x1="30" y1="120" x2="250" y2="120"/>
+        <text class="dl" x="30" y="104">A = 1</text>
+        <rect class="tr" x="80" y="115" width="18" height="10" rx="2"/><rect class="tr" x="140" y="115" width="18" height="10" rx="2"/><rect class="tr" x="200" y="115" width="18" height="10" rx="2"/>
+        <line class="rd-on" x1="30" y1="180" x2="250" y2="180"/>
+        <text class="dl" x="30" y="164">B = 1</text>
+        <rect class="tr" x="60" y="175" width="18" height="10" rx="2"/><rect class="tr" x="120" y="175" width="18" height="10" rx="2"/><rect class="tr" x="185" y="175" width="18" height="10" rx="2"/>
+        <text class="ds" x="30" y="214">inputs only tell the depot when to send</text>
+        <rect class="bx" x="250" y="100" width="120" height="100"/>
+        <text class="dl" x="310" y="140" text-anchor="middle">AND depot</text>
+        <text class="ds" x="310" y="162" text-anchor="middle">sends its</text>
+        <text class="ds" x="310" y="178" text-anchor="middle">own trucks</text>
+        <line class="rd-on" x1="370" y1="150" x2="472" y2="150"/>
+        <rect class="tr" x="392" y="145" width="18" height="10" rx="2"/><rect class="tr" x="432" y="145" width="18" height="10" rx="2"/>
+        <circle cx="500" cy="150" r="28" class="rd-on"/>
+        <polyline class="rd-on" points="520,130 590,90 730,90"/>
+        <polyline class="rd-on" points="520,170 590,210 730,210"/>
+        <rect class="tr" x="630" y="85" width="18" height="10" rx="2"/><rect class="tr" x="680" y="85" width="18" height="10" rx="2"/>
+        <rect class="tr" x="630" y="205" width="18" height="10" rx="2"/><rect class="tr" x="680" y="205" width="18" height="10" rx="2"/>
+        <text class="ds" x="610" y="76">to the XOR depot</text>
+        <text class="ds" x="610" y="236">to Carry Lane</text>
+        <text class="ds" x="546" y="146">roundabout copies to</text>
+        <text class="ds" x="546" y="162">every exit (fan-out)</text>
+        <line x1="20" y1="252" x2="740" y2="252" stroke="var(--line)" stroke-dasharray="4 6"/>
+        <text class="dl" x="30" y="280">Railway points = multiplexer</text>
+        <line class="rd-on" x1="30" y1="300" x2="494" y2="300"/>
+        <rect class="tr" x="300" y="295" width="18" height="10" rx="2"/><rect class="tr" x="360" y="295" width="18" height="10" rx="2"/><rect class="tr" x="420" y="295" width="18" height="10" rx="2"/>
+        <circle class="node" cx="500" cy="300" r="7"/>
+        <polyline class="rd-on" points="500,300 560,272 730,272"/>
+        <polyline class="rd-off" points="500,300 560,328 730,328"/>
+        <rect class="tr" x="640" y="267" width="18" height="10" rx="2"/>
+        <text class="ds" x="600" y="262">selected exit</text>
+        <text class="ds" x="600" y="318">other exit stays dark</text>
+        <rect class="bx" x="40" y="312" width="200" height="28"/>
+        <text class="ds" x="140" y="331" text-anchor="middle" style="fill:var(--ink)">City hall work order: SEL=0</text>
+        <polyline class="feed" points="240,326 470,326 496,306"/>
+      </svg>
+      </div>
+      <figcaption>Diagram of the rule, not a style proposal. Amber roads are carrying a 1. A roundabout copies traffic to every exit; railway points send it down only one, chosen by a selector. That is a multiplexer, the one place where "a car picks one road" is correct.</figcaption>
+    </figure>
+
+    <h3 style="margin-top:28px">Four signal models that can be combined</h3>
+    <div class="models">
+      <div class="model"><span class="lt">A · CONVOY</span><h3>A busy road is 1</h3>
+        <p>A steady stream of trucks means 1; an empty road means 0. Very easy to read. In a 1983 study, people taught a "teeming crowds" picture of electricity reasoned better about resistors, while people taught a water picture did better on batteries.<sup class="c"><a href="#s48">48</a></sup></p>
+        <p class="strain">Strains: it suggests energy is spent the whole time a 1 is held. Real CMOS mostly uses power when it switches.</p></div>
+      <div class="model"><span class="lt">B · PARKING LANE</span><h3>A full lane is 1</h3>
+        <p>Each road is a row of parking bays. To switch to 1, the depot's trucks drive out and fill the bays; to switch to 0, they drive home. Longer roads and more branches have more bays, so they take longer to fill. That is an honest picture of wire delay, fan-out load and the energy spent switching. It matches the "parking lots as buffers" idea from a paper on city traffic as computer traffic.<sup class="c"><a href="#s28">28</a></sup></p>
+        <p class="strain">Strains: the researcher's own synthesis. The physics is sound, but nobody has tested it as a UI.</p></div>
+      <div class="model"><span class="lt">C · CLOCKED DELIVERIES</span><h3>The traffic lights are the clock</h3>
+        <p>Warehouses (registers) open only when the lights change. They record whether their road is full, then hold that value. If the trucks haven't arrived in time, the warehouse stores the wrong value: a timing violation you can see. The light cycle can't be shorter than the longest commute, which is the critical path.</p>
+        <p class="strain">Strains: players have to juggle two kinds of time, travel and cycles.</p></div>
+      <div class="model"><span class="lt">D · REAL PACKETS (LATE GAME)</span><h3>Trucks are the data</h3>
+        <p>On-chip networks really do route packets between modules,<sup class="c"><a href="#s44">44</a></sup> and asynchronous circuits pass data with request/acknowledge handshakes.<sup class="c"><a href="#s42">42</a>,<a href="#s43">43</a></sup> Petri nets give exact rules for tokens.<sup class="c"><a href="#s41">41</a></sup></p>
+        <p class="strain">Strains: this is only true at the scale of cores and memory, well past an ALU.</p></div>
+    </div>
+
+    <h3 style="margin-top:28px">Where the metaphor breaks, and the patch</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Break</th><th>Patch</th><th>Precedent</th></tr></thead>
+      <tbody>
+        <tr><td>A car takes one branch; a signal goes down all of them.</td><td>Two junctions that look different: a <strong>roundabout</strong> copies to every exit, and <strong>railway points</strong> pick one.</td><td>In a Petri net a transition puts a token in every output; one place feeding two transitions is a choice.<sup class="c"><a href="#s41">41</a></sup> Human Resource Machine's COPYFROM leaves the value on the tile.<sup class="c"><a href="#s47">47</a></sup></td></tr>
+        <tr><td>A car is used up when it arrives.</td><td>Input trucks only deliver orders; the depot sends out its own trucks.</td><td>The belief that electricity gets "used up" persisted from first to final year among engineering technology students.<sup class="c"><a href="#s49">49</a></sup></td></tr>
+        <tr><td>A signal is a held level, not a packet.</td><td>The bit is the road's state; the number of trucks never matters.</td><td>ONI's on/off overlay;<sup class="c"><a href="#s16">16</a></sup> the Cities: Skylines adder used powered and unpowered power lines.<sup class="c"><a href="#s32">32</a></sup></td></tr>
+        <tr><td>Traffic jams and route choice.</td><td>No jams, no route-finding. The only limit is fan-out: each garage has a fixed fleet, and a relay depot acts as a buffer.</td><td>Mini Motorways cars pick the fastest route and jam,<sup class="c"><a href="#s52">52</a></sup> which is the behaviour to avoid.</td></tr>
+        <tr><td>Players read single trucks as data.</td><td>Draw uniform convoys or full lanes.</td><td>In Turing Tumble and Digi-Comp II the marbles are events; the bits live in the toggles.<sup class="c"><a href="#s45">45</a>,<a href="#s46">46</a></sup></td></tr>
+        <tr><td>Road length swamps everything else.</td><td>Make each depot's reaction time count at least as much as travel time.</td><td>Every Factorio combinator adds one tick (1/60 s);<sup class="c"><a href="#s39">39</a></sup> ONI gates react after "a split second".<sup class="c"><a href="#s16">16</a></sup></td></tr>
+      </tbody>
+    </table></div>
+    <p class="prose">Analogies shape what people conclude, both rightly and wrongly.<sup class="c"><a href="#s48">48</a></sup> The Teaching-With-Analogies method includes a step that spells out where the analogy breaks.<sup class="c"><a href="#s50">50</a></sup> The game could do this with an "Inspector's note" after each level.</p>
+  </div>
+</section>
+
+<section id="ladder">
+  <div class="wrap">
+    <div class="sec-head"><span class="kicker">Sheet E</span><h2>From one depot to an industrial district</h2></div>
+    <p class="prose">One way the adder-to-ALU path could grow as a city, using the depot rule. The names are placeholders.</p>
+    <ol class="ladder">
+      <li><span class="lot">01</span><span class="comp">NOT gate</span><h3>Night-shift depot</h3>
+        <p>Sends trucks when its input road is quiet. The player has to connect it to the power plant, which shows that a gate's output energy comes from the supply. Deliveries from the border test it, one truth-table row per "day".</p>
+        <p class="teach"><b>Teaches:</b> inversion; gates need power.</p></li>
+      <li><span class="lot">02</span><span class="comp">AND · OR</span><h3>Two-key depot and either-road depot</h3>
+        <p>The two-key depot sends trucks only when both input roads are busy; the either-road depot sends them when at least one is. Optionally, build everything from a single NAND depot, as Nand2Tetris does.<sup class="c"><a href="#s51">51</a></sup></p>
+        <p class="teach"><b>Teaches:</b> truth tables; one universal gate.</p></li>
+      <li><span class="lot">03</span><span class="comp">XOR</span><h3>The first composite block</h3>
+        <p>(A OR B) AND NOT (A AND B). Each input now feeds two depots, so the copy roundabout first appears here. Uneven road lengths cause a brief wrong pulse: the first glitch the player can see.</p>
+        <p class="teach"><b>Teaches:</b> fan-out; glitches.</p></li>
+      <li><span class="lot">04</span><span class="comp">Half adder</span><h3>Sum Street and Carry Lane</h3>
+        <p>One block with two exits: Sum Street (XOR) and Carry Lane (AND). Once it passes its tests, it can be zoned into a single building.</p>
+        <p class="teach"><b>Teaches:</b> binary addition; packaging a circuit as a part.</p></li>
+      <li><span class="lot">05</span><span class="comp">Full adder</span><h3>Two half-adder buildings and an OR depot</h3>
+        <p>Three input roads (A, B and carry-in) now feed buildings the player made earlier.</p>
+        <p class="teach"><b>Teaches:</b> reuse; carry-in.</p></li>
+      <li><span class="lot">06</span><span class="comp">4-bit ripple-carry adder</span><h3>Carry Street</h3>
+        <p>Four full-adder blocks along one street, passing the carry house to house. A stopwatch shows 0111 + 0001 rippling through all four. That commute is the propagation delay. The light cycle has to be longer than it, or the result warehouse stores garbage. Optional extra: an express motorway for carry-lookahead.</p>
+        <p class="teach"><b>Teaches:</b> propagation delay; the critical path; why clocks have a speed limit.</p></li>
+      <li><span class="lot">07</span><span class="comp">Multiplexer</span><h3>Railway-points interchange</h3>
+        <p>Points set by a selector road. First a 2:1 mux built from gates, then a 4:1 built from three 2:1s.</p>
+        <p class="teach"><b>Teaches:</b> selection; building big parts from small ones.</p></li>
+      <li><span class="lot">08</span><span class="comp">ALU</span><h3>The industrial district</h3>
+        <p>Four workshops run all the time, side by side: an adder; a subtractor (the same adder with B inverted and carry-in set to 1, which is two's complement); an AND row; and an OR row. City hall's 2-bit work order sets the points that pick which result leaves the district. An "empty-streets inspector" (a NOR of all outputs) raises the zero flag, and the last Carry Lane exit is the carry flag. A result warehouse at the end is the bridge to a CPU.</p>
+        <p class="teach"><b>Teaches:</b> hardware computes every operation, then selects one; opcodes; flags. For comparison, the Nand2Tetris ALU has zero and negative outputs but no carry flag.<sup class="c"><a href="#s51">51</a></sup></p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="risks">
+  <div class="wrap">
+    <div class="sec-head"><span class="kicker">Sheet F</span><h2>The strongest case against</h2></div>
+    <div class="prose">
+      <p>Going from gates to a CPU is already well taught. Turing Complete is 96% positive on Steam,<sup class="c"><a href="#s20">20</a></sup> and Nandgame, Digital Logic Sim and Chip Builder cover the same ground.<sup class="c"><a href="#s22">22</a>,<a href="#s29">29</a>,<a href="#s61">61</a></sup> A city adds a second picture the player has to learn and translate,<sup class="c"><a href="#s60">60</a></sup> so it must teach something a schematic can't. The best candidates are <strong>timing</strong> (you can watch a carry ripple down a street) and <strong>hierarchy</strong> (a tested block collapses into one building).</p>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Evidence and mitigation</th></tr></thead>
+      <tbody>
+        <tr><td>Translation cost: players learn the city, the logic, <em>and</em> the mapping between them</td><td><span class="tag z-civ">High</span></td><td><span class="tag z-civ">High</span></td><td>Learners often struggle to translate between representations.<sup class="c"><a href="#s60">60</a></sup> Keep a schematic overlay one keypress away, with the same layout in both views.</td></tr>
+        <tr><td>Other games already do this well</td><td><span class="tag z-civ">High</span></td><td><span class="tag z-civ">High</span></td><td>Turing Complete, Nandgame, Chip Builder.<sup class="c"><a href="#s20">20</a>,<a href="#s61">61</a></sup> Lead with timing and hierarchy, the things a city shows better.</td></tr>
+        <tr><td>Being a skin over a quiz ("chocolate-covered broccoli")</td><td><span class="tag z-ind">Medium</span></td><td><span class="tag z-civ">High</span></td><td>Building the content into the core mechanic gave more learning and about 7× more voluntary play in Habgood and Ainsworth's work;<sup class="c"><a href="#s54">54</a></sup> a 2021 study was more mixed.<sup class="c"><a href="#s55">55</a></sup> Here building circuits <em>is</em> the mechanic, which helps.</td></tr>
+        <tr><td>The metaphor teaches wrong ideas (used up, one branch, counting trucks)</td><td><span class="tag z-ind">Med–High</span></td><td><span class="tag z-ind">Medium</span></td><td>Analogies steer what people conclude,<sup class="c"><a href="#s48">48</a>,<a href="#s49">49</a></sup> and sims carry a "hidden curriculum" in their rules.<sup class="c"><a href="#s58">58</a></sup> Use the depot rule, roundabouts and Inspector's notes.</td></tr>
+        <tr><td>City-sim systems (money, happiness) fight exact, testable puzzles</td><td><span class="tag z-civ">High if both</span></td><td><span class="tag z-civ">High</span></td><td>Drop the economy; let growth mean unlocks.</td></tr>
+        <tr><td>Decoration distracts from what's being taught</td><td><span class="tag z-ind">Medium</span></td><td><span class="tag z-ind">Medium</span></td><td>The "seductive details" effect is small to medium.<sup class="c"><a href="#s59">59</a></sup> Decorate only what helps reading.</td></tr>
+        <tr><td>Thin evidence that games like this teach</td><td>—</td><td><span class="tag z-ind">Medium</span></td><td>A 2013 meta-analysis found a learning effect of d = 0.29, stronger alongside other teaching and over several sessions.<sup class="c"><a href="#s56">56</a></sup> The only Turing Complete study found is a student-perception survey.<sup class="c"><a href="#s57">57</a></sup></td></tr>
+        <tr><td>Difficulty cliffs</td><td><span class="tag z-ind">Medium</span></td><td><span class="tag z-ind">Medium</span></td><td>Robot Odyssey (1984) is remembered as the hardest computer game.<sup class="c"><a href="#s34">34</a></sup></td></tr>
+        <tr><td>Scope creep and art cost</td><td><span class="tag z-civ">High</span></td><td><span class="tag z-civ">High</span></td><td>A 4-bit adder alone takes 20+ gate buildings. Pick a style from Sheet A that a small team can keep up with.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section id="questions">
+  <div class="wrap">
+    <div class="sec-head"><span class="kicker">Sheet G</span><h2>Eight questions to answer before designing</h2></div>
+    <p class="prose">These cover the whole project, not just the art. Each comes with the cheapest first step toward an answer.</p>
+    <ol class="qs">
+      <li><h3>Who is the learner, and what should they be able to do when they finish?</h3>
+        <p><span class="k">Why it matters</span>It sets scope, difficulty and how you'll know the game worked. Evidence that games like this teach is thin,<sup class="c"><a href="#s56">56</a>,<a href="#s57">57</a></sup> so plan to measure it.</p>
+        <p><span class="k">Cheapest first step</span>Finish the sentence "After playing, a ___ can ___." Then turn it into a five-question before/after quiz for the first playtest.</p></li>
+      <li><h3>What can a city show that a schematic can't?</h3>
+        <p><span class="k">Why it matters</span>Turing Complete and Nandgame already teach gates to CPU well. Without an answer, there's no reason for the city.</p>
+        <p><span class="k">Cheapest first step</span>List three moments that only work in a city, like watching a carry ripple down a street.</p></li>
+      <li><h3>Is the city where you build, or a skin over a schematic?</h3>
+        <p><span class="k">Why it matters</span>Content built into the core mechanic beat content wrapped in a game.<sup class="c"><a href="#s54">54</a></sup></p>
+        <p><span class="k">Cheapest first step</span>Decide what the player's hands touch: roads and depots, or gate symbols. Mock a XOR both ways and ask 5–8 people to predict outputs for new inputs.</p></li>
+      <li><h3>What exactly is a signal, and how will the game admit where the metaphor breaks?</h3>
+        <p><span class="k">Why it matters</span>Each signal model leads players to different conclusions,<sup class="c"><a href="#s48">48</a></sup> and unstated limits become a hidden curriculum.<sup class="c"><a href="#s50">50</a>,<a href="#s58">58</a></sup></p>
+        <p><span class="k">Cheapest first step</span>Animate the convoy, parking-lane and token versions for ten seconds each, then ask testers: "What happens when this road splits?"</p></li>
+      <li><h3>Is timing a core mechanic or hidden?</h3>
+        <p><span class="k">Why it matters</span>Travel time as propagation delay is the delivery metaphor's biggest strength, and it's where a city beats a schematic.</p>
+        <p><span class="k">Cheapest first step</span>A tiny web sim of traffic-light cycle against carry delay. Is it fun to tune?</p></li>
+      <li><h3>What does "the city grows" mean: an economy, citizens, or just unlocks?</h3>
+        <p><span class="k">Why it matters</span>Money and happiness systems can fight exact, testable puzzles.</p>
+        <p><span class="k">Cheapest first step</span>Start with growth = unlocks only. Add sim systems only if playtesters say the city feels empty.</p></li>
+      <li><h3>When does a tested circuit become one building, and can players open it again?</h3>
+        <p><span class="k">Why it matters</span>Hierarchy (small parts making bigger parts) is the main idea in computer architecture. It also sets how far the game goes: just the ALU, or on to a CPU with memory.</p>
+        <p><span class="k">Cheapest first step</span>A paper prototype that zooms from gate to half adder to 4-bit adder.</p></li>
+      <li><h3>Which art style stays readable from one gate to a whole district, at a cost you can keep up?</h3>
+        <p><span class="k">Why it matters</span>Art is the biggest cost, and the style also decides the engine (browser for classrooms, or desktop for Steam).</p>
+        <p><span class="k">Cheapest first step</span>Greybox a 4-bit adder in a tile editor, count the tiles, and check it fits on one screen. Then dress the same layout in two styles from Sheet A.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <div class="sec-head"><span class="kicker">Sheet H</span><h2>Sources</h2></div>
+    <p class="prose" style="font-size:.9rem;color:var(--muted)">Gathered in two research passes in November 2026. Screenshots are loaded from each game's official Steam store page and belong to their studios. Where a source could only be read in part, the note says so.</p>
+    <ol class="sources">
+      <li id="s1"><a href="https://en.wikipedia.org/wiki/Mini_Metro_(video_game)">Mini Metro (video game), Wikipedia</a> <span class="what">— two-person studio, minimal art</span></li>
+      <li id="s2"><a href="https://en.wikipedia.org/wiki/Townscaper">Townscaper, Wikipedia</a> <span class="what">— irregular grid, rule-based detail</span></li>
+      <li id="s3"><a href="https://uploadvr.com/townscaper-concept-video-vr/">UploadVR on Townscaper</a> <span class="what">— solo developer</span></li>
+      <li id="s4"><a href="https://www.gamedeveloper.com/game-platforms/how-townscaper-works-a-story-four-games-in-the-making">Game Developer, "How Townscaper works"</a> <span class="what">— procedural tooling</span></li>
+      <li id="s5"><a href="https://en.wikipedia.org/wiki/Islanders_(video_game)">Islanders (video game), Wikipedia</a> <span class="what">— three people, about seven months</span></li>
+      <li id="s6"><a href="https://www.gamedeveloper.com/disciplines/sparking-joy-through-tile-placement-in-idyllic-village-builder-i-dorfromantik-i-">Game Developer on Dorfromantik</a> <span class="what">— four students, early style sheet</span></li>
+      <li id="s7"><a href="https://www.gamespark.jp/article/2022/05/18/118598.html">Game*Spark interview (Japanese)</a> <span class="what">— impressionist and wooden-toy influences</span></li>
+      <li id="s8"><a href="https://80.lv/articles/exclusive-tiny-glade-developers-discuss-bevy-proceduralism-publishers-cozy-games">80.lv, Tiny Glade developers</a> <span class="what">— two-person team, custom renderer</span></li>
+      <li id="s9"><a href="https://store.steampowered.com/app/2287430/Metropolis_1998/">Metropolis 1998, Steam</a> <span class="what">— 2D isometric pixel engine, in development</span></li>
+      <li id="s10"><a href="https://en.wikipedia.org/wiki/TheoTown">TheoTown, Wikipedia</a> <span class="what">— isometric pixel city builder</span></li>
+      <li id="s11"><a href="https://factorio.com/blog/post/fff-146">Factorio Friday Facts #146</a> <span class="what">— 3D-to-sprite pipeline with paint-over</span></li>
+      <li id="s12"><a href="https://gameworldobserver.com/2022/09/30/terra-nil-free-lives-interview-reverse-city-builder-studio-ghibli">Game World Observer, Terra Nil interview</a> <span class="what">— pixel prototype to painterly release</span></li>
+      <li id="s13"><a href="https://store.steampowered.com/app/454060">Blueprint Tycoon, Steam</a> <span class="what">— blueprint-styled factory game</span></li>
+      <li id="s14"><a href="https://store.steampowered.com/app/1124180/Rail_Route/">Rail Route, Steam</a> <span class="what">— minimal rail dispatcher</span></li>
+      <li id="s15"><a href="https://store.steampowered.com/app/732050/Voxel_Tycoon/">Voxel Tycoon, Steam</a> <span class="what">— voxel transport tycoon</span></li>
+      <li id="s16"><a href="https://oxygennotincluded.wiki.gg/wiki/Logic_gates">Oxygen Not Included wiki, Logic gates</a> <span class="what">— gate buildings, green/red signals, memory toggle, reaction delay</span></li>
+      <li id="s17"><a href="https://mechanistry.com/press/lumberpunk-city-builder-timberborn-launches-into-1-0-with-new-features-bonus-content-more">Mechanistry press release, Timberborn 1.0</a> <span class="what">— 20+ automation buildings</span></li>
+      <li id="s18"><a href="https://timberborn.org/wiki/automation-components">Timberborn fan wiki, automation components</a> <span class="what">— lists gates as separate buildings (conflicts with [36])</span></li>
+      <li id="s19"><a href="https://zem.fi/2005-10-21-ttd-logic">"Logic Gates in OpenTTD" (2005)</a> <span class="what">— train gates, 4-bit ripple-carry adder</span></li>
+      <li id="s20"><a href="https://store.steampowered.com/app/1444480/Turing_Complete/">Turing Complete, Steam</a> (96% positive when checked) and <a href="https://notebookcheck.net/Turing-Complete-2-0-swaps-Godot-for-a-custom-engine.1422915.0.html">Notebookcheck on Turing Complete 2</a> <span class="what">— NAND-to-CPU curriculum</span></li>
+      <li id="s21"><a href="https://hn.svelte.dev/item/49108571">Hacker News thread on ChipBuilder</a> <span class="what">— gate-to-CPU browser game, "AI aesthetics" critique</span></li>
+      <li id="s22"><a href="https://sebastian.itch.io/digital-logic-sim">Digital Logic Sim, itch.io</a> <span class="what">— minimal sim, custom chips become new parts</span></li>
+      <li id="s23"><a href="https://store.steampowered.com/app/684270">Silicon Zeroes, Steam</a> <span class="what">— CPU-design puzzle game</span></li>
+      <li id="s24"><a href="https://github.com/tobspr/shapez.io">shapez.io on GitHub</a> <span class="what">— began as a JavaScript web game</span></li>
+      <li id="s25"><a href="https://en.wikipedia.org/wiki/Little_Man_Computer">Little Man Computer, Wikipedia</a> <span class="what">— 1965 mailroom model of a CPU</span></li>
+      <li id="s26"><a href="https://www.inf.unibz.it/~rrobbes/p/ICSE2011-codecity.pdf">Wettel, Lanza &amp; Robbes, CodeCity (ICSE 2011)</a> <span class="what">— classes as buildings, packages as districts</span></li>
+      <li id="s27"><a href="https://www.wired.com/2016/08/extreme-closeup-computer-hardware-looks-like-tiny-cities/">Wired (2016), hardware close-ups look like tiny cities</a> <span class="what">— chip dies as aerial cities</span></li>
+      <li id="s28"><a href="https://core.ac.uk/download/161447347.pdf">Paper on city traffic as a metaphor for computer traffic</a> <span class="what">— parking lots as buffers (seen via search snippet only)</span></li>
+      <li id="s29"><a href="https://www.hackster.io/news/learn-how-to-build-a-simple-cpu-with-nand-game-8a584db1db93">Hackster on Nandgame</a> <span class="what">— browser NAND-to-CPU game</span></li>
+      <li id="s30"><a href="https://store.steampowered.com/app/1748260/Circuit_City/">Circuit City, Steam</a> <span class="what">— circuit-board city builder about algorithms (2022)</span></li>
+      <li id="s31"><a href="https://kylejussab.com/cpucity">Kyle Jussab, CPU City</a> <span class="what">— 2024 student prototype, playtest stats</span></li>
+      <li id="s32"><a href="https://gwern.net/doc/cs/2019-07-15-danielbali-citiesskylineisturingcomplete.html">Bali, "Cities: Skylines is Turing Complete" (2019)</a> and <a href="https://pcgamer.com/this-working-calculator-in-cities-skylines-is-powered-by-human-poo">PC Gamer</a> <span class="what">— 4-bit adder from power lines</span></li>
+      <li id="s33"><a href="https://polycorne.fr/en/siliconcity/">Silicon City, Polycorne</a> <span class="what">— unrelated traffic sim, same name</span></li>
+      <li id="s34"><a href="https://en.wikipedia.org/wiki/Robot_Odyssey">Robot Odyssey, Wikipedia</a>; <a href="https://slate.com/technology/2014/01/robot-odyssey-the-hardest-computer-game-of-all-time.html">Slate (2014)</a>; <a href="https://en.wikipedia.org/wiki/Rocky%27s_Boots">Rocky's Boots, Wikipedia</a> <span class="what">— early logic games and their difficulty</span></li>
+      <li id="s35"><a href="https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/8454419">US Patent 8,454,419</a> <span class="what">— curriculum mapped onto city buildings</span></li>
+      <li id="s36"><a href="https://timberborn.wiki.gg/wiki/Relay">Timberborn wiki, Relay</a> <span class="what">— one relay building with NOT/AND/OR/XOR modes</span></li>
+      <li id="s37"><a href="https://gamingonlinux.com/2026/03/timberborn-devs-announce-automation-is-coming-to-the-city-builder-in-the-1-0-release">GamingOnLinux on Timberborn 1.0</a> <span class="what">— automation, 12 March 2026</span></li>
+      <li id="s38"><a href="https://oxygennotincluded.wiki.gg/wiki/Automation_Ribbon">Oxygen Not Included wiki, Automation Ribbon</a> <span class="what">— 4-bit ribbon as a bus</span></li>
+      <li id="s39"><a href="https://wiki.factorio.com/Decider_combinator">Factorio wiki, Decider combinator</a> <span class="what">— one-tick latency</span></li>
+      <li id="s40"><a href="https://www.gamingonlinux.com/2020/10/open-source-infinite-shape-factory-sim-shapezio-has-a-major-new-release-up/">GamingOnLinux on the shapez.io wires update</a> and <a href="https://shapezio.fandom.com/wiki/Wire">shapez wiki, Wire</a> <span class="what">— separate wires layer with gates</span></li>
+      <li id="s41"><a href="https://en.wikipedia.org/wiki/Petri_net">Petri net, Wikipedia</a> <span class="what">— token firing rules, choice vs concurrency</span></li>
+      <li id="s42"><a href="https://en.wikipedia.org/wiki/Asynchronous_circuit">Asynchronous circuit, Wikipedia</a> <span class="what">— handshakes</span></li>
+      <li id="s43"><a href="https://dblp.org/pid/35/5713">Sutherland, "Micropipelines" (1989)</a> <span class="what">— event-driven pipelines</span></li>
+      <li id="s44"><a href="https://websrv.cecs.uci.edu/~papers/compendium94-03/papers/2001/dac01/pdffiles/41_4.pdf">Dally &amp; Towles, "Route Packets, Not Wires" (2001)</a> <span class="what">— on-chip packet networks</span></li>
+      <li id="s45"><a href="https://arxiv.org/abs/2110.09343">Pitt, "Turing Tumble is Turing-Complete"</a> <span class="what">— marbles plus toggle bits</span></li>
+      <li id="s46"><a href="https://www.wikiwand.com/en/articles/Digi-Comp_II">Digi-Comp II</a> <span class="what">— 1960s marble computer</span></li>
+      <li id="s47"><a href="https://strategywiki.org/wiki/Human_Resource_Machine/Year_3">StrategyWiki, Human Resource Machine Year 3</a> <span class="what">— COPYFROM copies without removing</span></li>
+      <li id="s48"><a href="https://groups.psych.northwestern.edu/gentner/papers/GentnerGentner83.pdf">Gentner &amp; Gentner (1983), "Flowing waters or teeming crowds"</a> <span class="what">— analogies shape reasoning (abstract and snippets only)</span></li>
+      <li id="s49"><a href="https://peer.asee.org/how-electrical-engineering-technology-students-understand-concepts-of-electricity-comparison-of-misconceptions-of-freshmen-sophomores-and-seniors.pdf">Goris et al., ASEE (2013)</a> <span class="what">— "used up" misconception persists (abstract only)</span></li>
+      <li id="s50"><a href="https://serc.carleton.edu/NAGTWorkshops/metacognition/activities/analogies.html">SERC on Glynn's Teaching-With-Analogies</a> <span class="what">— a step that names where the analogy breaks</span></li>
+      <li id="s51"><a href="https://www.nand2tetris.org/project02">Nand2Tetris, Project 2</a> <span class="what">— half adder to ALU; zero and negative outputs</span></li>
+      <li id="s52"><a href="https://www.pocketgamer.com/mini-motorways/tips-for-beginners">Pocket Gamer, Mini Motorways tips</a> <span class="what">— roundabouts, lights, route choice</span></li>
+      <li id="s53"><a href="https://www.mobygames.com/game/cities-skylines-industries">MobyGames, Cities: Skylines Industries</a> <span class="what">— industry chains and warehouses</span></li>
+      <li id="s54"><a href="https://www.kqed.org/mindshift/20765/whats-the-secret-sauce-to-a-great-educational-game">KQED MindShift on Habgood's research</a> and <a href="https://www.de.ed.ac.uk/node/435">Habgood seminar</a> <span class="what">— building content into the mechanic</span></li>
+      <li id="s55"><a href="https://www.frontiersin.org/articles/10.3389/fpsyg.2021.678380/full">Frontiers in Psychology (2021)</a> <span class="what">— game vs quiz, mixed result</span></li>
+      <li id="s56"><a href="https://research-portal.uu.nl/en/publications/a-meta-analysis-of-the-cognitive-and-motivational-effects-of-seri/">Wouters et al. (2013) meta-analysis</a> <span class="what">— serious games learning effect d = 0.29</span></li>
+      <li id="s57"><a href="https://peer.asee.org/45615">McKanna &amp; Hassan, ASEE (2024)</a> <span class="what">— Turing Complete perception survey (full text not readable)</span></li>
+      <li id="s58"><a href="https://prospect.org/1994/04/01/seductions-sim-policy-simulation-game/">Starr, "Seductions of Sim" (1994)</a> <span class="what">— the hidden curriculum of sims</span></li>
+      <li id="s59"><a href="https://en.wikipedia.org/wiki/Seductive_details">Seductive details, Wikipedia</a> <span class="what">— decoration can hurt learning</span></li>
+      <li id="s60"><a href="https://nottingham-repository.worktribe.com/output/23577631/deft-a-conceptual-framework-for-considering-learning-with-multiple-representations">Ainsworth (2006), DeFT framework</a> <span class="what">— the cost of translating between representations</span></li>
+      <li id="s61"><a href="https://store.steampowered.com/app/5095670">Chip Builder, Steam</a> <span class="what">— gates to CPU, released 21 Sep 2026</span></li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">Circuit City · a style reference board for a city builder about computer architecture · researched November 2026. Game screenshots © their studios, loaded from official Steam store pages for reference.</div>
+</footer>
+
+<dialog id="lb" aria-label="Enlarged screenshot">
+  <img id="lb-img" alt="">
+  <div class="bar"><span id="lb-cap"></span><span><a id="lb-link" href="#" target="_blank" rel="noopener">Store page ↗</a> &nbsp; <button id="lb-close" type="button">Close</button></span></div>
+</dialog>
+
+<script>
+const CDN='https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/';
+const G={ // game id -> [name, studio, year, screenshot path]
+  287980:['Mini Metro','Dinosaur Polo Club',2015,'287980/ss_540acc2e1e630b059c20e2887a22ca61eb323afe'],
+  1127500:['Mini Motorways','Dinosaur Polo Club',2021,'1127500/ss_7a57d11fd0d3a097b02645f96b49f81793b6ac7f'],
+  1124180:['Rail Route','Bitrich.info',2024,'1124180/ss_ee90836f3d3de597fb02071bb6455797ce281b2b'],
+  454060:['Blueprint Tycoon','Endless Loop Studios',2016,'454060/ss_80a78e28dc3db5ed856e5e8b7484e409d4028b2f'],
+  1444480:['Turing Complete','LevelHead',2021,'1444480/10f0987dc0010cd1a95e99674b77bdf5ba91c948/ss_10f0987dc0010cd1a95e99674b77bdf5ba91c948'],
+  684270:['Silicon Zeroes','PleasingFungus Games',2017,'684270/ss_477ddb609b7ba820153ecc9b7887f2ccfd732977'],
+  233450:['Prison Architect','Introversion Software',2015,'233450/ss_0c13ec061d922fbe8ad518eb58487cff09d3fd40'],
+  294100:['RimWorld','Ludeon Studios',2018,'294100/80e383ef19353058791efe17a6485849246c9c17/ss_80e383ef19353058791efe17a6485849246c9c17'],
+  1318690:['shapez','Tobias Springer',2020,'1318690/ss_13235b05cdd091dc835c68419fa440e6bbfd5114'],
+  1536610:['OpenTTD','OpenTTD team',2021,'1536610/ss_8994cb799dfad2e4ba93b9f29943ceb6aeaacaf3'],
+  1084020:['TheoTown','Lobby',2019,'1084020/ss_dcd088e25a0339ebcf2f1e2d6c403a1cc1fc396b'],
+  2287430:['Metropolis 1998','Yesbox Studios','2026 (in development)','2287430/6e0b53d064e7ed4c296b4b5daa02cdd789e9d4b2/ss_6e0b53d064e7ed4c296b4b5daa02cdd789e9d4b2'],
+  1336490:['Against the Storm','Eremite Games',2023,'1336490/ss_c7a8ad6065ddaa4789935d28d99e24c940c2181c'],
+  1593030:['Terra Nil','Free Lives',2023,'1593030/ss_6cd1cb55eaa724b291f669f8d9d17b88ecb1f2e9'],
+  1351080:['Pharaoh: A New Era','Triskell Interactive',2023,'1351080/ss_37413c921406823ffc6d05bf4a4704d302000551'],
+  255710:['Cities: Skylines','Colossal Order',2015,'255710/ss_0754001c88ad4dbfff92faf9a97e8d87cf3f8840'],
+  916440:['Anno 1800','Ubisoft Mainz',2019,'916440/ecebd0ae477a204c46e3998be53fdd854cf3b089/ss_ecebd0ae477a204c46e3998be53fdd854cf3b089'],
+  323190:['Frostpunk','11 bit studios',2018,'323190/ss_28db92509d505c855b07d480d749119fc147c84c'],
+  1046030:['Islanders','Grizzly Games',2019,'1046030/ss_8c62b14de6d60916ff35a50000596bff79fadd71'],
+  569480:['Kingdoms and Castles','Lion Shield',2017,'569480/ss_8edcd3c9cb93ee1e38df6ad676166ff567d4a7cb'],
+  874390:['The Battle of Polytopia','Midjiwan',2020,'874390/ss_7c8459064cf765cfb2d3f3e94cab161fc4ca1249'],
+  1291340:['Townscaper','Oskar Stålberg',2021,'1291340/ss_989ff1808d9416c7b22da3e16ee54874697b1cea'],
+  1455840:['Dorfromantik','Toukana Interactive',2022,'1455840/ss_a49e5fcc5301e8a05a1da7ce233a5377cf680e98'],
+  2198150:['Tiny Glade','Pounce Light',2024,'2198150/ss_6a8c7a510715796a659bd9fd828cc02cf73e11de'],
+  732050:['Voxel Tycoon','Voxel Tycoon',2021,'732050/ss_1e740d91dbd969deae7f6eb6548dddb6cb48ed86'],
+  416210:["Block'hood",'Plethora Project',2017,'416210/ss_dc9cd8cbf5a79c437fd43019b1108171f615632a'],
+  2162800:['shapez 2','tobspr Games',2026,'2162800/16462abda91738df594156d4b2f0a3869bb03d49/ss_16462abda91738df594156d4b2f0a3869bb03d49'],
+  1113120:['Ixion','Bulwark Studios',2022,'1113120/ss_70ca08c9126adcb2b8c0410b3462fcf46d269884'],
+  464920:['Surviving Mars','Haemimont Games',2018,'464920/ss_44ac0358c939aad3facac813fc4482d77b912937'],
+  457140:['Oxygen Not Included','Klei Entertainment',2019,'457140/ss_78d1c92edeecc7b17cafa9248867fe7d4390a0a0'],
+  1062090:['Timberborn','Mechanistry',2026,'1062090/bbf958ad2ec8df142d77eca318461719d47bc2cf/ss_bbf958ad2ec8df142d77eca318461719d47bc2cf'],
+  375820:['Human Resource Machine','Tomorrow Corporation',2015,'375820/ss_5de238ca62f67dc97c940bd6af61c03a4320c981'],
+  427520:['Factorio','Wube Software',2020,'427520/ss_192864c00fc38b5ef97b97ca7fa655a9aed7c0da'],
+  242920:['Banished','Shining Rock Software',2014,'242920/ss_888a226267a065f2afa2a0d3a75200c2ec928ca7'],
+  949230:['Cities: Skylines II','Colossal Order',2023,'949230/c5bc1c21dfa34627c31ea78a61fa906df2f62ae1/ss_c5bc1c21dfa34627c31ea78a61fa906df2f62ae1'],
+  1748260:['Circuit City','Lucid Silence Games',2022,'1748260/ss_d1c9f92c68007740b49f54b056614ef0175657cf'],
+  5095670:['Chip Builder','Laurentiu & David Raducu',2026,'5095670/9dcb092a8e55f0c0ef86eae1d49174c5d4b3f0ae/ss_9dcb092a8e55f0c0ef86eae1d49174c5d4b3f0ae']
+};
+const img=(id,size)=>CDN+G[id][3]+'.'+(size||'600x338')+'.jpg';
+const store=id=>'https://store.steampowered.com/app/'+id+'/';
+const cite=(...n)=>'<sup class="c">'+n.map(x=>'<a href="#s'+x+'">'+x+'</a>').join(',')+'</sup>';
+
+// cam: top | iso | 3d | side. cost: [2D web, 3D engine], 1 = cheap, 3 = heavy.
+const STYLES=[
+ {n:'Transit-map minimal',games:[287980,1127500,1124180],cam:['top'],cost:[1,1],
+  look:'Flat shapes, thick coloured lines, near-empty ground. Reads like a subway map.',
+  gate:'A junction "station" with a shape for its type. The coloured line between stations is the signal.',
+  note:'Mini Metro\'s two-person team picked this partly because they had little experience making art assets'+cite(1)+'. Rail Route applies the same look to train dispatching'+cite(14)+'. It is the closest style to a circuit diagram, which also makes it the least city-like.'},
+ {n:'Blueprint / schematic',games:[454060,1444480,684270],cam:['top'],cost:[1,1],
+  look:'Blue or dark grid, line art, labels, a technical-drawing mood.',
+  gate:'The real gate symbol, drawn as a building footprint. The most accurate option and the least like a city.',
+  note:'This is the default look of logic simulators'+cite(13,20)+', so players will read it as a "simulator", not a city.'},
+ {n:'Flat top-down cutaway',games:[233450,294100,1318690],cam:['top'],cost:[1,2],
+  look:'Readable icons, roofs removed so you see inside rooms, clean vector or pixel shapes.',
+  gate:'Rooms inside one building: a full adder is a building whose rooms are its gates.',
+  note:'shapez started as a JavaScript browser game'+cite(24)+'. The style is proven in 2D web and needs only a moderate number of assets.'},
+ {n:'Isometric pixel art',games:[1536610,1084020,2287430],cam:['iso'],cost:[3,2],
+  look:'2:1 diamond tiles, a limited palette and dense hand-placed detail. The classic SimCity 2000 look, still alive in TheoTown and the upcoming Metropolis 1998'+cite(9,10)+'.',
+  gate:'One small building per gate with a rooftop sign; lit windows show on/off.',
+  note:'Easy to draw in a browser, expensive to make. Roads need a tile for every way they can connect, and buildings can\'t rotate. Factorio\'s shortcut is to model in 3D, render to sprites, then paint over them'+cite(11)+'.'},
+ {n:'Painterly / hand-painted',games:[1336490,1593030,1351080],cam:['iso','3d'],cost:[3,3],
+  look:'Soft brushwork and warm light, like a storybook or a Ghibli background.',
+  gate:'Landmark-style buildings with lots of character. Small on/off changes risk getting lost in the texture.',
+  note:'Terra Nil\'s game-jam prototype was chunky pixel art; the commercial release went painterly'+cite(12)+'. You can prototype cheaply and re-skin later. Either way it needs a real illustrator.'},
+ {n:'Realistic 3D sim',games:[255710,916440,323190],cam:['3d'],cost:[3,3],
+  look:'Detailed, lit, near-photographic towns and traffic. The genre\'s mainstream look.',
+  gate:'A highway interchange or a factory. At this scale you can only read signal state through an overlay map.',
+  note:'This is what most players picture when they hear "city builder", and the most expensive style here. Modern Anno is detailed realistic 3D, not hand-painted; only the early Anno games were 2D.'},
+ {n:'Low-poly minimal 3D',games:[1046030,569480,874390],cam:['3d','iso'],cost:[2,1],
+  look:'Flat-shaded solids, pastel colours, few details. Calm and very readable.',
+  gate:'Colour-coded blocks. Flat shading makes an on/off colour change very easy to spot.',
+  note:'Islanders was made by three people in about seven months, and its simplicity was forced by team size'+cite(5)+'. Vertex-coloured models need no texturing, and you can pre-render them to sprites for 2D.'},
+ {n:'Toy diorama / tilt-shift',games:[1291340,1455840,2198150],cam:['3d'],cost:[3,2],
+  look:'A miniature tabletop world with soft shadows and depth of field. Pieces feel like wooden toys.',
+  gate:'Pieces that snap together and decorate themselves. A correct full adder could grow arches and gardens.',
+  note:'Townscaper was made solo'+cite(3)+'; its pieces sprout detail from rules'+cite(2,4)+'. Dorfromantik (four students) wrote a style sheet early'+cite(6,7)+'. Tiny Glade is two people with a custom renderer'+cite(8)+'. The models are cheap, but the lighting and procedural tech take real skill.'},
+ {n:'Voxel',games:[732050,416210],cam:['3d','iso'],cost:[1,1],
+  look:'Chunky cubes, like Minecraft. Blocky but tidy.',
+  gate:'Blocky gate buildings. Minecraft redstone already taught millions of players to read circuits in cubes.',
+  note:'Models are quick to make in a voxel editor and render well in three.js. You can also pre-render voxels as isometric sprites for a 2D build'+cite(15)+'.'},
+ {n:'Neon / "inside the machine"',games:[2162800,1113120,464920],cam:['3d','top'],cost:[1,1],
+  look:'Glowing lines on dark ground, Tron-style grids, sci-fi domes and stations.',
+  gate:'A glowing node; live wires pulse with light. It looks like a computer straight away.',
+  note:'Glow is cheap in SVG and in 3D. But one critic called a recent gate-to-CPU browser game\'s dark neon look "AI aesthetics"'+cite(21)+', so it can read as generic.'},
+ {n:'Cozy cartoon colony',games:[457140,1062090,375820],cam:['side','3d'],cost:[2,3],
+  look:'Characterful creatures or workers, hand-drawn or stylised, with jokes in the details.',
+  gate:'Workers carry bits from building to building. Human Resource Machine already makes a single office worker the CPU.',
+  note:'Mascots can carry the teaching, but characters and animation are the costly part of this style. Oxygen Not Included shows its wiring in a separate overlay view'+cite(16)+'.'}
+];
+
+const board=document.getElementById('board');
+const camName={top:'Top-down 2D',iso:'Isometric',['3d']:'Free 3D',side:'Side view'};
+const pips=v=>'<span class="pips" aria-label="'+['','low','medium','high'][v]+'">'+[1,2,3].map(i=>'<i class="'+(i<=v?'on':'')+'"></i>').join('')+'</span>';
+const fig=(id,i)=>'<figure><button type="button" data-id="'+id+'" aria-label="Enlarge '+G[id][0]+' screenshot"><img loading="lazy" decoding="async" width="600" height="338" src="'+img(id)+'" alt="Screenshot of '+G[id][0]+' ('+G[id][1]+', '+G[id][2]+')"></button><figcaption>'+G[id][0]+'</figcaption></figure>';
+STYLES.forEach((s,i)=>{
+  const a=document.createElement('article');
+  a.className='style';a.dataset.cam=s.cam.join(' ');a.dataset.cheap=Math.min(...s.cost)===1?'1':'0';
+  a.innerHTML='<div class="shots">'+s.games.map(fig).join('')+'</div>'+
+   '<div class="body"><span class="num">STYLE '+String(i+1).padStart(2,'0')+'</span><h3>'+s.n+'</h3>'+
+   '<div class="tags">'+s.cam.map(c=>'<span class="tag">'+camName[c]+'</span>').join('')+'</div>'+
+   '<dl><dt>Look</dt><dd>'+s.look+'</dd><dt>A gate</dt><dd>'+s.gate+'</dd></dl>'+
+   '<p class="note">'+s.note+'</p>'+
+   '<p class="refs">See: '+s.games.map(id=>'<a href="'+store(id)+'" target="_blank" rel="noopener">'+G[id][0]+'</a>').join(' · ')+'</p>'+
+   '<div class="pip-row"><span>2D web'+pips(s.cost[0])+'</span><span>3D engine'+pips(s.cost[1])+'</span></div></div>';
+  board.appendChild(a);
+});
+
+let cam='all',cheap=false;
+function applyFilter(){
+  let shown=0;
+  board.querySelectorAll('.style').forEach(el=>{
+    const ok=(cam==='all'||el.dataset.cam.split(' ').includes(cam))&&(!cheap||el.dataset.cheap==='1');
+    el.hidden=!ok; if(ok)shown++;
+  });
+  document.getElementById('count').textContent='Showing '+shown+' of '+STYLES.length;
+}
+document.querySelectorAll('.chip[data-cam]').forEach(b=>b.addEventListener('click',()=>{
+  cam=b.dataset.cam;
+  document.querySelectorAll('.chip[data-cam]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+  applyFilter();
+}));
+const cheapBtn=document.getElementById('cheap');
+cheapBtn.addEventListener('click',()=>{cheap=!cheap;cheapBtn.setAttribute('aria-pressed',String(cheap));applyFilter();});
+applyFilter();
+
+// prior art
+const PRIOR=[
+ {id:457140,t:'Gate buildings (AND, OR, NOT, XOR) and a memory latch inside a colony. Wires carry a green/red signal and show in an overlay.',c:'mid',cl:'Gates in a colony',src:[16]},
+ {id:1062090,t:'Version 1.0 (12 March 2026) added 20+ automation buildings: sensors, timers, a memory, and a Relay that can be set to NOT, AND, OR or XOR. One fan site lists these as separate gate buildings instead.',c:'mid',cl:'Gates in a city',src:[17,18,36,37]},
+ {id:1748260,t:'A "relaxing city builder" on a circuit board, where data agents run computer-science algorithms. It doesn\'t cover gates or an ALU, and had 9 Steam reviews when checked.',c:'mid',cl:'Near miss: circuit-board city',src:[30]},
+ {id:1444480,t:'Takes you from a NAND gate to a working CPU and assembly code on a dark schematic grid. 96% positive on Steam. No city.',c:'hi',cl:'Same curriculum',src:[20]},
+ {id:5095670,t:'Released 21 Sep 2026. Gates to ALU to CPU, starting as a browser game. One critic called its look "AI aesthetics".',c:'hi',cl:'Same curriculum',src:[21,61]},
+ {id:684270,t:'A puzzle game about building CPU-like circuits from parts. Clean schematic look.',c:'hi',cl:'Same curriculum',src:[23]},
+ {id:375820,t:'An office worker is the CPU, floor tiles are registers, and the inbox and outbox are I/O. Teaches programming, not hardware.',c:'mid',cl:'Workplace as CPU',src:[25]},
+ {id:427520,t:'Logic is an add-on to the factory: combinators and a circuit network control belts and trains.',c:'lo',cl:'Logic as add-on',src:[]},
+ {id:1536610,t:'In 2005 a player built logic gates and a 4-bit ripple-carry adder from trains and signals. They called it "not a very good platform".',c:'mid',cl:'Rails as wires',src:[19]},
+ {id:2162800,t:'A factory game with a wires layer and a dark, glowing sci-fi look. Its predecessor began as a browser game.',c:'lo',cl:'Logic as add-on',src:[24]}
+];
+document.getElementById('prior-grid').innerHTML=PRIOR.map(p=>'<figure><img loading="lazy" decoding="async" width="600" height="338" src="'+img(p.id)+'" alt="Screenshot of '+G[p.id][0]+'"><figcaption><b>'+G[p.id][0]+'</b><span class="by">'+G[p.id][1]+', '+G[p.id][2]+'</span>'+p.t+(p.src.length?cite(...p.src):'')+'<br><span class="closeness close-'+p.c+'">'+p.cl+'</span> · <a href="'+store(p.id)+'" target="_blank" rel="noopener">Steam ↗</a></figcaption></figure>').join('');
+
+// building <-> component cards. z = zoning colour.
+const MAP=[
+ {n:'Houses and residential rows',z:'res',zl:'Residential',id:255710,to:'Input bits; later, memory (numbered houses)',
+  fit:'Trips start at homes, as in Mini Motorways, so houses are natural signal sources. Numbered houses echo the Little Man Computer\'s numbered mailboxes'+cite(25)+'.',
+  strain:'Population growth and happiness have nothing to map to.',seen:'SimCity, Cities: Skylines, Anno 1800'},
+ {n:'Industry and production chains',z:'ind',zl:'Industrial',id:427520,to:'Gates and circuits; the industrial district is the ALU',
+  fit:'Inputs are turned into outputs, which is how data flows through logic. Cities: Skylines Industries chains raw goods to processing to factories'+cite(53)+'.',
+  strain:'Real chains use up their inputs and need ratios; logic does neither.',seen:'Anno 1800, Cities: Skylines Industries, Factorio'},
+ {n:'Utilities: power plants and lines',z:'util',zl:'Utility',id:323190,to:'Power supply and ground; relay hubs act as buffers',
+  fit:'Every depot visibly needs power, which is true of real gates. Frostpunk\'s steam hubs extend a generator\'s reach, a lot like a buffer.',
+  strain:'Capacity and coverage puzzles add noise.',seen:'Cities: Skylines, Frostpunk, Oxygen Not Included'},
+ {n:'Roads and lanes',z:'util',zl:'Transport',id:1127500,to:'Wires; a multi-lane road is a bus; a bridge is a crossing',
+  fit:'The delivery metaphor maps straight onto roads. ONI\'s 4-bit Automation Ribbon is a precedent for a bus drawn as one wide road'+cite(38)+'.',
+  strain:'Traffic jams and route-finding have to go: Mini Motorways cars pick the fastest route and jam'+cite(52)+'.',seen:'Every city builder'},
+ {n:'Junctions: roundabouts and railway points',z:'util',zl:'Transport',id:1124180,to:'Fan-out (roundabout) and multiplexer (points)',
+  fit:'Railway points are an almost literal multiplexer: a selector decides which track the traffic takes.',
+  strain:'Players have to learn that the two junctions behave differently.',seen:'Mini Motorways, OpenTTD, Rail Route, Factorio'},
+ {n:'Warehouses and storage',z:'com',zl:'Storage',id:242920,to:'Registers and flip-flops; the flags register',
+  fit:'Holds a value between deliveries. The door opens only when the lights change, like a D flip-flop.',
+  strain:'A warehouse holds quantities; a register holds one bit per slot.',seen:'Banished, Anno, Cities: Skylines, Timberborn'},
+ {n:'The traffic-light cycle',z:'util',zl:'Transport',id:2287430,to:'The clock',
+  fit:'Ties directly to the deliveries. The cycle can\'t be shorter than the longest commute.',
+  strain:'Real clock signals travel on wires; they don\'t cover an area.',seen:'Mini Motorways, Cities: Skylines'},
+ {n:'City hall and dispatch office',z:'civ',zl:'Civic',id:1351080,to:'Opcode decoder and control',
+  fit:'One authority issues a "work order" that sets the points.',
+  strain:'Past the ALU it grows into a full control unit.',seen:'SimCity, Anno, Pharaoh'},
+ {n:'Districts and zoning upgrades',z:'civ',zl:'Civic',id:949230,to:'Encapsulation: a tested block becomes one building',
+  fit:'Hierarchy is the central idea of computer architecture. Turing Complete and Digital Logic Sim already turn finished chips into new parts'+cite(20,22)+'.',
+  strain:'Upgrades must come from passing tests, not from demand.',seen:'Cities: Skylines districts, Anno tier upgrades'},
+ {n:'Border crossings and ports',z:'com',zl:'Trade',id:916440,to:'Input/output and the test harness',
+  fit:'A neighbouring city sends inputs and checks the outputs, like the level tests in Turing Complete.',
+  strain:'Little; it maps cleanly.',seen:'Cities: Skylines outside connections, Anno harbours'},
+ {n:'Landmarks and wonders',z:'civ',zl:'Civic',id:2198150,to:'The finished ALU, built in stages',
+  fit:'A milestone everyone can see from far away.',
+  strain:'It has to work, not just decorate.',seen:'SimCity arcologies, Anno World\'s Fair'},
+ {n:'Services, parks and decoration',z:'res',zl:'Amenity',id:1046030,to:'Nothing, except readability',
+  fit:'Rooftop gate symbols and signs can help players read a circuit.',
+  strain:'Police and fire coverage don\'t map, and decoration can distract from learning (the "seductive details" effect)'+cite(59)+'.',seen:'SimCity, Townscaper, Islanders'}
+];
+document.getElementById('map-grid').innerHTML=MAP.map(m=>'<article class="bld"><div class="shots">'+fig(m.id)+'</div><div class="body">'+
+  '<div class="tags"><span class="tag z-'+m.z+'">'+m.zl+'</span></div><h3>'+m.n+'</h3><p class="to">'+m.to+'</p>'+
+  '<p><span class="k">Fits</span>'+m.fit+'</p><p><span class="k">Strains</span>'+m.strain+'</p><p class="seen">Seen in: '+m.seen+'</p></div></article>').join('');
+
+// lightbox
+const lb=document.getElementById('lb');
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-id]'); if(!b)return;
+  const id=b.dataset.id;
+  const im=document.getElementById('lb-img'); im.src=img(id,'1920x1080'); im.alt='Screenshot of '+G[id][0];
+  document.getElementById('lb-cap').textContent=G[id][0]+' · '+G[id][1]+' · '+G[id][2];
+  document.getElementById('lb-link').href=store(id);
+  if(lb.showModal)lb.showModal();
+});
+document.getElementById('lb-close').addEventListener('click',()=>lb.close());
+lb.addEventListener('click',e=>{if(e.target===lb)lb.close();});
+</script>
+</body>
+</html>
