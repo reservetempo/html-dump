@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voxel Logic City</title>
+<meta name="description" content="A voxel mood board for a city-building game where the street map is the circuit: gates are houses, adders are districts, and one layout is skinned as a medieval town, a factory or a glowing reef.">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f6f4ef;
+  --surface: #ffffff;
+  --text: #1c1b19;
+  --muted: #5c5850;
+  --line: #ddd6c9;
+  --accent: #1b5d87;
+  --soft: #ece7dc;
+  --warn: #8a3b12;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131417;
+    --surface: #1b1d21;
+    --text: #e9e6df;
+    --muted: #a7a197;
+    --line: #34373d;
+    --accent: #8ec5ea;
+    --soft: #23262b;
+    --warn: #f0a77d;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+.prose { max-width: 70ch; }
+header { padding: 48px 0 8px; }
+.kicker { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.1; margin: 0 0 12px; }
+h2 { font-size: 1.6rem; line-height: 1.25; margin: 56px 0 12px; padding-top: 16px; border-top: 1px solid var(--line); }
+h3 { font-size: 1.2rem; margin: 32px 0 8px; }
+h4 { font-size: 1rem; margin: 24px 0 6px; }
+.lede { font-size: 1.12rem; }
+.bottom {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--accent);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 20px 0;
+  max-width: 78ch;
+}
+.bottom h2 { margin: 0 0 8px; padding: 0; border: 0; font-size: 1.25rem; }
+.bottom ul { margin: 0; padding-left: 1.2em; }
+.bottom li { margin: 6px 0; }
+.confidence { color: var(--muted); font-size: .95rem; margin: 12px 0 0; }
+nav.toc { font-size: .92rem; margin: 16px 0 0; }
+nav.toc ol { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.rule {
+  background: var(--soft);
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 1.08rem;
+  max-width: 70ch;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px;
+  margin: 12px 0 8px;
+}
+figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+figure .ph { display: block; background: var(--soft); }
+figure img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+figcaption { padding: 10px 12px 12px; font-size: .88rem; line-height: 1.45; }
+.credit { display: block; margin-top: 6px; color: var(--muted); font-size: .78rem; }
+.credit a { color: inherit; }
+.table-wrap { margin: 12px 0; }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--soft); }
+tr:last-child td { border-bottom: 0; }
+.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sw, .chip { display: inline-block; width: 12px; height: 12px; border-radius: 2px; background: var(--c); border: 1px solid rgba(0,0,0,.25); vertical-align: -1px; margin-right: 6px; }
+.palette { list-style: none; padding: 0; margin: 12px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.palette li { display: flex; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: .9rem; line-height: 1.3; }
+.palette .chip { width: 34px; height: 34px; flex: none; margin: 0; border-radius: 4px; }
+.palette small { color: var(--muted); }
+code { font-size: .85em; }
+dl.answers { display: grid; grid-template-columns: 9.5rem 1fr; gap: 8px 16px; max-width: 80ch; }
+dl.answers dt { font-weight: 600; }
+dl.answers dd { margin: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 4px; }
+.tabs button {
+  font: inherit; font-size: .95rem; cursor: pointer;
+  padding: 8px 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--text);
+}
+.tabs button[aria-selected="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.panel { padding-top: 4px; }
+.panel > h3:first-child { margin-top: 16px; }
+.risk {
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--warn);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 12px 16px;
+  max-width: 78ch;
+}
+.risk p { margin: 6px 0; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.card figure { border: 0; border-radius: 0; border-bottom: 1px solid var(--line); }
+.card .body { padding: 12px 14px; font-size: .93rem; }
+.card h3 { margin: 0 0 6px; }
+.sources, .credits { font-size: .85rem; overflow-wrap: anywhere; }
+.sources li, .credits li { margin: 4px 0; }
+sup.cite { font-size: .7em; line-height: 0; }
+sup.cite a { text-decoration: none; padding: 0 1px; }
+footer { color: var(--muted); font-size: .85rem; padding: 32px 0 48px; }
+@media (max-width: 640px) {
+  table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; width: 100%; }
+  table.stack { border: 0; background: none; }
+  table.stack thead { display: none; }
+  table.stack tr { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; margin: 0 0 10px; padding: 6px 0; }
+  table.stack td { border: 0; padding: 3px 12px; }
+  table.stack td::before { content: attr(data-label); display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  table.stack td.num { text-align: left; }
+  dl.answers { grid-template-columns: 1fr; gap: 2px; }
+  dl.answers dd { margin-bottom: 10px; }
+  table.ladder tr { display: grid; grid-template-columns: 1.2fr 1.4fr auto; column-gap: 8px; padding: 8px 0; }
+  table.ladder td:nth-child(4), table.ladder td:nth-child(5) { grid-column: 1 / -1; }
+  table.ladder td:nth-child(4) { padding-top: 6px; }
+  table.ladder td:nth-child(4)::before, table.ladder td:nth-child(5)::before { display: none; }
+  table.ladder td:nth-child(3) { text-align: right; }
+}
+table.ladder td:first-child { white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="kicker">Idea · research mood board · November 2026</p>
+  <h1>Voxel Logic City</h1>
+  <p class="lede prose">A city-building game for learning computer architecture, where the street map <em>is</em> the circuit schematic: gates are houses, adders are districts, memory is a whole quarter. This is a voxel mood board for it, with existing projects, the building ladder and three themes.</p>
+</header>
+
+<section class="bottom" aria-labelledby="bl">
+  <h2 id="bl">Bottom line</h2>
+  <ul>
+    <li><b>Make the layout the schematic and the theme a skin.</b> The same map should read as Lantern Town, Line-Shaft Works or Glow Reef. Names, palettes and props change; streets, junctions and walls never do.</li>
+    <li><b>A signal is the state of a street, never a traveller.</b> It is a lit lane, a running belt or a glowing root. Messengers, crates and ripples only animate a change. This one rule blocks the worst mistake each theme invites: a messenger can't be in two places, a crate gets used up, a root seems to grow and learn.</li>
+    <li><b>Nobody seems to have built it.</b> Games teach the climb from gates to a CPU (Turing Complete, NandGame) or put gates inside a world (Oxygen Not Included, Minecraft). None makes the city plan itself the circuit. The closest thing is a 2019 player hack: a 4-bit adder built in <i>Cities: Skylines</i>.</li>
+    <li><b>The biggest risk is that players learn the city, not the schematic.</b> Symbolic buildings and charming themes can distract. The fix is part of the design: a slider that morphs the city into a standard schematic, and puzzles that are answered in schematic form.</li>
+  </ul>
+  <p class="confidence"><b>Confidence:</b> medium for the design conventions, which borrow from chip layout, circuit diagrams and research on how people map cities. Low for the learning claim: no study has tested whether a city layout helps people read schematics. A prototype would be that test.</p>
+  <nav class="toc" aria-label="On this page">
+    <ol>
+      <li><a href="#board">Inspiration board</a></li>
+      <li><a href="#exists">What exists</a></li>
+      <li><a href="#rule">The one rule</a></li>
+      <li><a href="#ladder">Building ladder</a></li>
+      <li><a href="#themes">Three themes</a></li>
+      <li><a href="#other">Other themes</a></li>
+      <li><a href="#against">The case against</a></li>
+      <li><a href="#next">Next tests</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ol>
+  </nav>
+</section>
+
+<main>
+
+<section aria-labelledby="board">
+  <h2 id="board">Inspiration board</h2>
+  <p class="prose">Three kinds of existing work feed the look: chips that already resemble cities, logic built from things other than wires, and voxel games whose style could carry it.</p>
+
+  <h3>Chips already look like cities</h3>
+  <div class="gallery">
+    <figure><a class="ph" href="img/die-6502.jpg"><img src="img/die-6502.jpg" alt="Microscope photo of the MOS 6502 chip die, a dense grid of coloured circuitry" loading="lazy" decoding="async"></a><figcaption><b>MOS 6502 die (1975).</b> Seen from above, a chip reads like an aerial view of a city. Photographers keep making the comparison <sup class="cite"><a href="#src-1" aria-label="Source 1">1</a></sup>. <span class="credit">Pauli Rautakorpi · <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:MOS_6502_die.jpg">Wikimedia Commons</a></span></figcaption></figure>
+    <figure><a class="ph" href="img/die-6502-breaknes.jpg"><img src="img/die-6502-breaknes.jpg" alt="The 6502 die with coloured regions marking its functional blocks" loading="lazy" decoding="async"></a><figcaption><b>The same die, zoned by function.</b> BreakNES colours the arithmetic, interrupt and memory-cell regions. This is the nearest existing picture of a city with its schematic laid over it. <span class="credit">BreakNES.com · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:BreakNES_MOS_6502.jpg">Wikimedia Commons</a></span></figcaption></figure>
+    <figure><a class="ph" href="img/intel-4004-layout.jpg"><img src="img/intel-4004-layout.jpg" alt="Hand-coloured mask layout drawing of the Intel 4004 chip" loading="lazy" decoding="async"></a><figcaption><b>Intel 4004 mask layout (1971).</b> Hand-coloured layers read like a street plan with overpasses. <span class="credit">Wolfgang Stief (photo), Pittigrilli (edit) · <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a> · <a href="https://commons.wikimedia.org/wiki/File:Chip_layout_from_the_development_phase_of_the_Intel_4004_from_1971,_the_first_microprocessor_of_the_world_(cropped_and_edited_image).jpg">Wikimedia Commons</a></span></figcaption></figure>
+    <figure><a class="ph" href="img/megaprocessor.jpg"><img src="img/megaprocessor.jpg" alt="A room-sized wall of circuit boards covered in LEDs" loading="lazy" decoding="async"></a><figcaption><b>Megaprocessor (2016).</b> A 16-bit CPU about 10 m long, built from roughly 40,000 transistors, with over 10,500 LEDs showing every signal. You walk along it like a street <sup class="cite"><a href="#src-2" aria-label="Source 2">2</a></sup>. <span class="credit">Steve Elliott from UK · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Megaprocessor_(51331601517).jpg">Wikimedia Commons</a></span></figcaption></figure>
+    <figure><a class="ph" href="https://wettel.github.io/codecity.html"><img src="https://wettel.github.io/pics/codecity_screenshot.png" alt="A 3D city of coloured blocks representing a software system" loading="lazy" decoding="async"></a><figcaption><b>CodeCity (2011).</b> Java's standard library drawn as a city: classes are buildings, packages are districts. In a controlled study it helped developers answer more questions correctly, and faster <sup class="cite"><a href="#src-3" aria-label="Source 3">3</a></sup>. <span class="credit">© Richard Wettel · <a href="https://wettel.github.io/codecity.html">CodeCity page</a></span></figcaption></figure>
+  </div>
+
+  <h3>Logic built from other things</h3>
+  <div class="gallery">
+    <figure><a class="ph" href="https://store.steampowered.com/app/1444480/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1444480/65ac5660daf8f24bad19c0df28dfa2454a8c7965/ss_65ac5660daf8f24bad19c0df28dfa2454a8c7965.600x338.jpg" alt="Screenshot of a large player-built circuit with wide bus lines" loading="lazy" decoding="async"></a><figcaption><b>Turing Complete (2021 onward).</b> Climbs from NAND gates to a working computer. You package circuits as custom components, and buses run like highways <sup class="cite"><a href="#src-4" aria-label="Source 4">4</a></sup>. <span class="credit">© LevelHead · <a href="https://store.steampowered.com/app/1444480/">Turing Complete page</a></span></figcaption></figure>
+    <figure><a class="ph" href="https://store.steampowered.com/app/1054340/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1054340/ss_5ffca6a3a134dbd8b26f3f822a32b2a034c448c7.600x338.jpg" alt="3D blocky logic gates and wires on coloured circuit boards" loading="lazy" decoding="async"></a><figcaption><b>Logic World (2021).</b> A first-person 3D sandbox with chunky gate blocks and wires: the closest existing voxel-like logic look <sup class="cite"><a href="#src-5" aria-label="Source 5">5</a></sup>. <span class="credit">© Mouse Hat Games · <a href="https://store.steampowered.com/app/1054340/">Logic World page</a></span></figcaption></figure>
+    <figure><a class="ph" href="img/digi-comp-ii.jpg"><img src="img/digi-comp-ii.jpg" alt="A plastic marble-run computer board with levers and marbles" loading="lazy" decoding="async"></a><figcaption><b>Digi-Comp II (1960s).</b> A marble-run computer. Here the signal is an object rolling downhill. <span class="credit">Bobroswell · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Digi-Comp_II.jpg">Wikimedia Commons</a></span></figcaption></figure>
+    <figure><a class="ph" href="img/fluidic-and-xor.png"><img src="img/fluidic-and-xor.png" alt="Diagram of a fluidic logic element with input and output channels" loading="lazy" decoding="async"></a><figcaption><b>Fluidic AND and XOR.</b> Logic made from jets of fluid with no electronics at all: a real basis for a waterworks theme. <span class="credit">Joseph Fyfield, Xing Liu · Public domain · <a href="https://commons.wikimedia.org/wiki/File:Fluidic_AND_XOR.svg">Wikimedia Commons</a></span></figcaption></figure>
+  </div>
+
+  <h3>Voxel looks</h3>
+  <div class="gallery">
+    <figure><a class="ph" href="https://store.steampowered.com/app/732050/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/732050/ss_1e740d91dbd969deae7f6eb6548dddb6cb48ed86.600x338.jpg" alt="Isometric voxel landscape with rail lines, factories and a town" loading="lazy" decoding="async"></a><figcaption><b>Voxel Tycoon (2021).</b> Isometric voxel rail yards and industry towns: the strongest art reference for a factory or rail city <sup class="cite"><a href="#src-6" aria-label="Source 6">6</a></sup>. <span class="credit">© Voxel Tycoon · <a href="https://store.steampowered.com/app/732050/">Voxel Tycoon page</a></span></figcaption></figure>
+    <figure><a class="ph" href="https://store.steampowered.com/app/1167630/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1167630/ss_b140eeaf8e489dfa4451411ae23c28a0ecb26729.600x338.jpg" alt="Realistically lit voxel street scene" loading="lazy" decoding="async"></a><figcaption><b>Teardown (2022).</b> One voxel is 10 cm, chosen to recreate the MagicaVoxel feel, with ray-traced light. The realistic end of the range <sup class="cite"><a href="#src-7" aria-label="Source 7">7</a></sup>. <span class="credit">© Tuxedo Labs · <a href="https://store.steampowered.com/app/1167630/">Teardown page</a></span></figcaption></figure>
+    <figure><a class="ph" href="https://store.steampowered.com/app/416210/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/416210/ss_dc9cd8cbf5a79c437fd43019b1108171f615632a.600x338.jpg" alt="A tower of stacked voxel blocks on a floating island" loading="lazy" decoding="async"></a><figcaption><b>Block'hood (2017).</b> Voxel blocks with resource inputs and outputs, stacked into towers: the nearest city builder where a building is a component with ports <sup class="cite"><a href="#src-8" aria-label="Source 8">8</a></sup>. <span class="credit">© Plethora Project · <a href="https://store.steampowered.com/app/416210/">Block'hood page</a></span></figcaption></figure>
+    <figure><a class="ph" href="https://ephtracy.github.io/"><img src="https://raw.githubusercontent.com/ephtracy/ephtracy.github.io/master/image/monu8.png" alt="Pastel isometric voxel diorama on a plinth" loading="lazy" decoding="async"></a><figcaption><b>MagicaVoxel showcase render.</b> The diorama-on-a-plinth look most voxel art uses. Each model draws from one 256-colour palette <sup class="cite"><a href="#src-9" aria-label="Source 9">9</a></sup>. <span class="credit">© ephtracy · <a href="https://ephtracy.github.io/">MagicaVoxel page</a></span></figcaption></figure>
+    <figure><a class="ph" href="https://store.steampowered.com/app/1291340/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1291340/ss_989ff1808d9416c7b22da3e16ee54874697b1cea.600x338.jpg" alt="A colourful island town of small houses on the water" loading="lazy" decoding="async"></a><figcaption><b>Townscaper (2021).</b> Not voxels, but grid-snapped tiles that assemble into a town that feels organic. <span class="credit">© Oskar Stålberg · <a href="https://store.steampowered.com/app/1291340/">Townscaper page</a></span></figcaption></figure>
+    <figure><a class="ph" href="https://store.steampowered.com/app/287980/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/287980/ss_c7bc5df7e606504709e9f53ff9c7584ac4c01b18.600x338.jpg" alt="Minimal transit map with coloured lines and station symbols" loading="lazy" decoding="async"></a><figcaption><b>Mini Metro (2015).</b> A city reduced to a transit schematic: the same idea, run in reverse <sup class="cite"><a href="#src-10" aria-label="Source 10">10</a></sup>. <span class="credit">© Dinosaur Polo Club · <a href="https://store.steampowered.com/app/287980/">Mini Metro page</a></span></figcaption></figure>
+  </div>
+  <p class="prose">Voxel artists share a few habits worth keeping. They use a small palette, often 16 to 32 colours per scene. Every voxel stands for one fixed real-world size. Silhouette comes before detail, soft baked shadows (ambient occlusion) give the blocks depth, glowing voxels show state, and scenes are framed as dioramas. These are community habits rather than research findings.</p>
+</section>
+
+<section aria-labelledby="exists">
+  <h2 id="exists">What already exists</h2>
+  <p class="prose">Two families of games come near the idea. Some teach the ladder from gates to a computer on a flat board. Others put working gates inside a world, but the world's layout serves something else.</p>
+  <div class="table-wrap">
+  <table class="stack">
+    <thead><tr><th>Project</th><th>What it is</th><th>How close to "the layout is the schematic"</th></tr></thead>
+    <tbody>
+      <tr><td data-label="Project"><b>Cities: Skylines adder</b> (Daniel Bali, 2019)</td><td data-label="What it is">A 4-bit adder built in the unmodded game. A powered power line is a 1, water and sewage make AND and OR gates, and a flooded power plant is the NOT. Each bit uses 9 mixed gates. One addition takes about 15 in-game months, around 20 real minutes <sup class="cite"><a href="#src-11" aria-label="Source 11">11</a>,<a href="#src-12" aria-label="Source 12">12</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Closest. The city really computes, but its layout serves the hack, not legibility.</td></tr>
+      <tr><td data-label="Project"><b>Turing Complete</b></td><td data-label="What it is">NAND gates up to a CPU, with custom components and a flat 2D board. A 2024 ASEE paper proposes it for digital-logic courses <sup class="cite"><a href="#src-4" aria-label="Source 4">4</a>,<a href="#src-13" aria-label="Source 13">13</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Right ladder, no city.</td></tr>
+      <tr><td data-label="Project"><b>NandGame</b> (2018, browser)</td><td data-label="What it is">NAND, then gates, adders, memory and a CPU. Each solved level becomes a reusable part <sup class="cite"><a href="#src-14" aria-label="Source 14">14</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Same ladder as this idea, no space.</td></tr>
+      <tr><td data-label="Project"><b>Digital Logic Sim</b> (Sebastian Lague)</td><td data-label="What it is">Start from a NAND and package circuits into chips, layer by layer. Open source (MIT) <sup class="cite"><a href="#src-15" aria-label="Source 15">15</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Ladder and encapsulation, no space.</td></tr>
+      <tr><td data-label="Project"><b>Logic World</b> (2021)</td><td data-label="What it is">A 3D first-person logic sandbox <sup class="cite"><a href="#src-5" aria-label="Source 5">5</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Spatial, but a workbench rather than a city.</td></tr>
+      <tr><td data-label="Project"><b>Oxygen Not Included</b></td><td data-label="What it is">A colony sim with AND, OR, XOR and NOT gate buildings and a Memory Toggle, which is an SR latch <sup class="cite"><a href="#src-16" aria-label="Source 16">16</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Gates live in a city, but the layout serves the colony.</td></tr>
+      <tr><td data-label="Project"><b>Minecraft redstone</b></td><td data-label="What it is">The redstone torch is both the NOT gate and a power source. Wire carries 15 blocks, and torches and repeaters add delay. CHUNGUS 2 is an 8-bit CPU running at 1 Hz with 256 bytes of RAM <sup class="cite"><a href="#src-17" aria-label="Source 17">17</a>,<a href="#src-18" aria-label="Source 18">18</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Delay and "NOT needs power" are literal. The layout is freeform.</td></tr>
+      <tr><td data-label="Project"><b>Factorio, shapez</b></td><td data-label="What it is">Factorio has combinators on wire networks with one tick of delay each; shapez has a wires layer with gates <sup class="cite"><a href="#src-19" aria-label="Source 19">19</a>,<a href="#src-20" aria-label="Source 20">20</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Factory precedent, but logic is a side system.</td></tr>
+      <tr><td data-label="Project"><b>Robot Odyssey</b> (1984)</td><td data-label="What it is">You build circuits inside robots and "burn" them into chips you can no longer see inside <sup class="cite"><a href="#src-21" aria-label="Source 21">21</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Encapsulation, 40 years ago.</td></tr>
+      <tr><td data-label="Project"><b>CodeCity</b> (2011)</td><td data-label="What it is">Software drawn as a city <sup class="cite"><a href="#src-3" aria-label="Source 3">3</a></sup>.</td><td data-label="How close to "the layout is the schematic"">Shows the metaphor working for code, not circuits.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section aria-labelledby="rule">
+  <h2 id="rule">The one rule, and how the layout carries the schematic</h2>
+  <p class="rule"><b>A signal is the state of a path.</b> A lane is lit or dark, a belt is running or stopped, a root glows or it doesn't. Anything that moves only shows a change passing through.</p>
+  <p class="prose">The buildings are symbolic, so nothing about a building's shape says what it computes. The schematic has to live in the map instead: its streets, walls, signs and colours. These conventions borrow from circuit diagrams <sup class="cite"><a href="#src-22" aria-label="Source 22">22</a></sup>, from chip layout, and from Kevin Lynch's study of how people form mental maps of cities <sup class="cite"><a href="#src-23" aria-label="Source 23">23</a></sup>.</p>
+
+  <div class="table-wrap">
+  <table class="stack">
+    <thead><tr><th>City element (Lynch, 1960)</th><th>Circuit concept</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td data-label="City element (Lynch, 1960)"><b>Paths</b></td><td data-label="Circuit concept">Nets and wires. A bus is a High Street.</td><td data-label="Rule">One street is one net, and the street name is the net label.</td></tr>
+      <tr><td data-label="City element (Lynch, 1960)"><b>Edges</b></td><td data-label="Circuit concept">Module boundaries; the supply and ground rails.</td><td data-label="Rule">Walls mark modules, and their gateways are the ports. Supply runs along the north wall, ground along the south.</td></tr>
+      <tr><td data-label="City element (Lynch, 1960)"><b>Districts</b></td><td data-label="Circuit concept">Modules.</td><td data-label="Rule">One category per district: an Arithmetic quarter, an Archive quarter.</td></tr>
+      <tr><td data-label="City element (Lynch, 1960)"><b>Nodes</b></td><td data-label="Circuit concept">Fan-out junctions, multiplexers, bus interchanges.</td><td data-label="Rule">A plaza is the junction dot on a schematic.</td></tr>
+      <tr><td data-label="City element (Lynch, 1960)"><b>Landmarks</b></td><td data-label="Circuit concept">Global signals and top-level inputs and outputs.</td><td data-label="Rule">The clock tower and the ALU are visible from everywhere. City gates are the inputs and outputs.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Twelve layout conventions</h3>
+  <ol class="prose">
+    <li><b>Signals flow west to east</b>, the way a schematic reads left to right. Any lane running back from east to west is a feedback lane with its own style (an arcade or a hedge), so storage reads as "where the roads loop back".</li>
+    <li><b>Supply along the north edge, ground along the south.</b> Every building has a tap to each.</li>
+    <li><b>One driver per street.</b> Two buildings driving the same street is an error, shown as a brawl. Don't copy Oxygen Not Included, where a whole wire network turns on if any output on it is on <sup class="cite"><a href="#src-24" aria-label="Source 24">24</a></sup>. Real logic doesn't behave like that.</li>
+    <li><b>Plazas are junction dots and bridges are crossings with no connection.</b> Avoid four-way crossroads; use two staggered T-junctions, as modern schematics do <sup class="cite"><a href="#src-22" aria-label="Source 22">22</a></sup>.</li>
+    <li><b>Walls are hierarchy.</b> Zoom out and a district collapses into one labelled block, the way Robot Odyssey burned circuits into chips <sup class="cite"><a href="#src-21" aria-label="Source 21">21</a></sup> and Turing Complete packages custom components <sup class="cite"><a href="#src-4" aria-label="Source 4">4</a></sup>.</li>
+    <li><b>Roof colour shows category; glow shows state.</b> Reserve one glowing colour for logic 1, and never rely on red against green alone.</li>
+    <li><b>Every building carries a name and an icon</b>, on a label layer that can stay switched on.</li>
+    <li><b>Footprint grows with NAND cost</b>, one lot per NAND. Cost becomes visible without the building's shape having to encode its function.</li>
+    <li><b>A bus is a boulevard</b> with numbered lanes, least significant bit on the south side.</li>
+    <li><b>The clock is a landmark</b> with its own violet lanes branching like an H-tree to every storage building. Only storage connects to it.</li>
+    <li><b>Overlays work like Cities: Skylines' info views</b>, which recolour the whole city by one variable (it has 36) <sup class="cite"><a href="#src-25" aria-label="Source 25">25</a></sup>. Useful views here: Signal, Category, Delay (the critical path in red, like traffic) and Clock.</li>
+    <li><b>A city-to-schematic slider.</b> Sliding it morphs roofs into gate symbols and straightens streets, the way Harry Beck's Tube map dropped geography <sup class="cite"><a href="#src-26" aria-label="Source 26">26</a></sup>. This builds in "concreteness fading" (start concrete, end with the symbol) <sup class="cite"><a href="#src-27" aria-label="Source 27">27</a></sup> and helps players translate between the two pictures <sup class="cite"><a href="#src-28" aria-label="Source 28">28</a></sup>.</li>
+  </ol>
+
+  <p class="prose">Chips already look like this. Rent's rule links a block's gate count to how many connections leave it, and memory has far fewer outside connections per gate than random logic <sup class="cite"><a href="#src-29" aria-label="Source 29">29</a>,<a href="#src-30" aria-label="Source 30">30</a></sup>. So a RAM quarter should look like an orderly grid town and the logic quarter like a tangled old town, which is how real dies look.</p>
+  <p class="prose">One warning from map research: people store cities as nested regions, and that distorts. Many people judge Reno to be east of San Diego because Nevada is east of California <sup class="cite"><a href="#src-31" aria-label="Source 31">31</a></sup>. Players will assume buildings in the same district are wired together, so the overlay has to show the true connections across walls.</p>
+</section>
+
+<section aria-labelledby="ladder">
+  <h2 id="ladder">The building ladder</h2>
+  <p class="prose">Five categories, from the smallest houses to whole quarters. The NAND cost is how many NAND gates each part takes in the standard construction <sup class="cite"><a href="#src-32" aria-label="Source 32">32</a>,<a href="#src-33" aria-label="Source 33">33</a></sup>, and it sets the building's footprint. NAND, not AND, is the cheapest house: in CMOS a NAND takes 4 transistors and an AND takes 6.</p>
+  <div class="table-wrap">
+  <table class="stack">
+    <thead><tr><th>Category</th><th>Parts (NAND cost)</th><th>Role in the city</th></tr></thead>
+    <tbody>
+      <tr><td data-label="Category"><b>Logic</b></td><td data-label="Parts (NAND cost)">NOT 1 · NAND 1 · AND 2 · OR 3 · XOR 4</td><td data-label="Role in the city">The houses. Everything else is built from these.</td></tr>
+      <tr><td data-label="Category"><b>Routing</b></td><td data-label="Parts (NAND cost)">Wire · fan-out junction · buffer 2 · crossing · 2:1 mux 4 · bus</td><td data-label="Role in the city">Streets and junctions: where a signal goes, and who picks.</td></tr>
+      <tr><td data-label="Category"><b>Arithmetic</b></td><td data-label="Parts (NAND cost)">Half adder 5 · full adder 9 · 4-bit ripple adder 36 · 4-bit ALU ≈140</td><td data-label="Role in the city">Districts and the first landmark.</td></tr>
+      <tr><td data-label="Category"><b>Storage</b></td><td data-label="Parts (NAND cost)">SR latch 2 · gated D latch 4–5 · D flip-flop 6 (edge-triggered) or 9 (master–slave) · register 10–13 per bit · 16 × 4 RAM ≈1,000</td><td data-label="Role in the city">Where roads loop back on themselves, up to a whole quarter.</td></tr>
+      <tr><td data-label="Category"><b>Timing</b></td><td data-label="Parts (NAND cost)">Clock</td><td data-label="Role in the city">One landmark. Only storage listens to it.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="prose"><b>Scale.</b> By the researcher's estimate, a 4-bit ALU, four 4-bit registers and a 16 × 4 RAM add up to about 1,300 NAND gates. At one lot per NAND, that is a market town of about 1,300 houses. Simulating that many gates is easy. Placing and reading them by hand is not, so collapsing a finished district into one block is a core mechanic, not a nicety. (The ALU and RAM figures are estimates; the others are standard counts.)</p>
+</section>
+
+<section aria-labelledby="themes">
+  <h2 id="themes">Three themes, same map</h2>
+  <p class="prose">Each theme has to answer four questions honestly, or it teaches something false:</p>
+  <ol class="prose">
+    <li>Where does a NOT gate's 1 come from when nothing comes in? It needs a supply.</li>
+    <li>How does one signal feed many buildings (fan-out), and what does that cost?</li>
+    <li>Why does a long chain take time (delay)?</li>
+    <li>What is the clock, and who listens to it?</li>
+  </ol>
+  <p class="prose">Gentner and Gentner found that different analogies for electricity lead people to different conclusions <sup class="cite"><a href="#src-34" aria-label="Source 34">34</a></sup>. So each theme below also names the misconception it most risks teaching, and how to head it off.</p>
+
+  <div class="tabs" role="tablist" aria-label="Themes" hidden>
+    <button role="tab" id="tab-medieval" aria-controls="panel-medieval" aria-selected="true">Lantern Town · medieval</button>
+    <button role="tab" id="tab-factory" aria-controls="panel-factory" aria-selected="false" tabindex="-1">Line-Shaft Works · factory</button>
+    <button role="tab" id="tab-organic" aria-controls="panel-organic" aria-selected="false" tabindex="-1">Glow Reef · organic</button>
+  </div>
+
+  <div class="panel" id="panel-medieval" role="tabpanel" aria-labelledby="tab-medieval">
+    <h3>Lantern Town (medieval)</h3>
+    <p class="prose">A walled market town at blue hour: stone, oak and slate, with heraldic banners. It should read like a tapestry map, orderly and quiet. Heraldry is already a standard sign system, so its colours can carry the categories.</p>
+    <ul class="palette"><li><span class="chip" style="--c:#D9CCB0"></span><span><b>Limestone</b><br><small>base · <code>#D9CCB0</code></small></span></li><li><span class="chip" style="--c:#6B4A2F"></span><span><b>Oak</b><br><small>base · <code>#6B4A2F</code></small></span></li><li><span class="chip" style="--c:#4A5562"></span><span><b>Slate</b><br><small>routing · <code>#4A5562</code></small></span></li><li><span class="chip" style="--c:#B0302A"></span><span><b>Gules red</b><br><small>logic · <code>#B0302A</code></small></span></li><li><span class="chip" style="--c:#2F7A4A"></span><span><b>Vert green</b><br><small>arithmetic · <code>#2F7A4A</code></small></span></li><li><span class="chip" style="--c:#2C5A92"></span><span><b>Azure</b><br><small>storage · <code>#2C5A92</code></small></span></li><li><span class="chip" style="--c:#6E3B7A"></span><span><b>Purpure</b><br><small>timing · <code>#6E3B7A</code></small></span></li><li><span class="chip" style="--c:#F5B841"></span><span><b>Lantern gold</b><br><small>signal = 1 (only glowing colour) · <code>#F5B841</code></small></span></li></ul>
+    <h4>How it answers the four questions</h4>
+    <dl class="answers">
+      <dt>1 and 0</dt><dd>The lamps along a lane are lit (1) or dark (0). Banners on output buildings repeat the state.</dd>
+      <dt>NOT's supply</dt><dd>An Oil Road runs along the north wall from the Chandlery, and every building has a short tap to it. A NOT lights its lane from that tap unless its input lane is lit. Nothing unconnected can be lit, so there is no 1 from nowhere.</dd>
+      <dt>Ground</dt><dd>The moat along the south wall. A snuffed lane drains into it.</dd>
+      <dt>Fan-out</dt><dd>A lit lane can light many branches at a market cross. Each branch adds lighting time, the way delay in a real chip grows with load. Past about four branches you build a Relay Tower.</dd>
+      <dt>Delay</dt><dd>Lamplighters walk at a fixed pace and each building adds one tick. The critical path is the longest walk.</dd>
+      <dt>Clock</dt><dd>The Belfry. Only scribes (the flip-flops) act on the bell; gates react at once. Sound reaching far houses later is an honest picture of clock skew.</dd>
+    </dl>
+    <h4>Building ladder</h4>
+    <div class="table-wrap"><table class="stack ladder"><thead><tr><th>Category</th><th>Part</th><th class="num">NAND</th><th>Building</th><th>What it looks like</th></tr></thead><tbody><tr><td data-label="Category"><span class="sw" style="--c:#B0302A"></span>Logic</td><td data-label="Part">NOT</td><td data-label="NAND" class="num">1</td><td data-label="Building"><b>Contrary Watch-house</b></td><td data-label="What it looks like">Squat round tower with one lantern cage and an oil cistern tapped to the north road. The only small building with a visible supply.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#B0302A"></span>Logic</td><td data-label="Part">NAND</td><td data-label="NAND" class="num">1</td><td data-label="Building"><b>Burgher's House</b></td><td data-label="What it looks like">Plain 2×2 timber-framed house with a red gable, built in rows. Cheapest and universal, so it fills the old town.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#B0302A"></span>Logic</td><td data-label="Part">AND</td><td data-label="NAND" class="num">2</td><td data-label="Building"><b>Twin-Portcullis Gate</b></td><td data-label="What it looks like">Gatehouse with two portcullises in series: the lane beyond is lit only if both are raised.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#B0302A"></span>Logic</td><td data-label="Part">OR</td><td data-label="NAND" class="num">3</td><td data-label="Building"><b>Twin Postern</b></td><td data-label="What it looks like">Two arches side by side: lit if either is.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#B0302A"></span>Logic</td><td data-label="Part">XOR</td><td data-label="NAND" class="num">4</td><td data-label="Building"><b>Herald's Court</b></td><td data-label="What it looks like">Hall whose roof and banner are split in two colours ("party per pale"), heraldry's sign for "the two differ".</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#4A5562"></span>Routing</td><td data-label="Part">Wire</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Lantern Lane</b></td><td data-label="What it looks like">One-voxel cobbled lane with lamp posts. The state belongs to the street.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#4A5562"></span>Routing</td><td data-label="Part">Fan-out junction</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Market Cross</b></td><td data-label="What it looks like">Covered cross on a plaza with a fingerpost: one lane in, several out. The plaza is the junction dot.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#4A5562"></span>Routing</td><td data-label="Part">Buffer</td><td data-label="NAND" class="num">2</td><td data-label="Building"><b>Relay Tower</b></td><td data-label="What it looks like">Chappe-style tower with semaphore arms that re-lights a long or crowded lane (+1 tick).</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#4A5562"></span>Routing</td><td data-label="Part">Crossing</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Hump Bridge</b></td><td data-label="What it looks like">Stone bridge carrying one lane over another, with no connection.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#4A5562"></span>Routing</td><td data-label="Part">2:1 mux</td><td data-label="NAND" class="num">4</td><td data-label="Building"><b>Toll Bridge</b></td><td data-label="What it looks like">Gatehouse at a fork with a pennant naming the open road.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#4A5562"></span>Routing</td><td data-label="Part">Bus</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>High Street</b></td><td data-label="What it looks like">4- or 8-lane boulevard with numbered lane banners, bit 0 on the south side.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2F7A4A"></span>Arithmetic</td><td data-label="Part">Half adder</td><td data-label="NAND" class="num">5</td><td data-label="Building"><b>Tally House</b></td><td data-label="What it looks like">Small counting house with two exits, Sum to the east and Carry to the north-east.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2F7A4A"></span>Arithmetic</td><td data-label="Part">Full adder</td><td data-label="NAND" class="num">9</td><td data-label="Building"><b>Exchequer House</b></td><td data-label="What it looks like">Hall with a black-and-white chequered roof, after the medieval counting cloth.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2F7A4A"></span>Arithmetic</td><td data-label="Part">4-bit ripple adder</td><td data-label="NAND" class="num">36</td><td data-label="Building"><b>Exchequer Row</b></td><td data-label="What it looks like">Four houses along one street. The carry lamplighter visibly runs door to door.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2F7A4A"></span>Arithmetic</td><td data-label="Part">ALU</td><td data-label="NAND" class="num">≈140</td><td data-label="Building"><b>Guildhall</b></td><td data-label="What it looks like">Large timber guildhall with a tower whose banners select ADD, AND, OR or XOR.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2C5A92"></span>Storage</td><td data-label="Part">SR latch</td><td data-label="NAND" class="num">2</td><td data-label="Building"><b>Twin Watchtowers</b></td><td data-label="What it looks like">Two towers each lit while the other is dark, joined by a westward feedback lane.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2C5A92"></span>Storage</td><td data-label="Part">D flip-flop</td><td data-label="NAND" class="num">6–9</td><td data-label="Building"><b>Scribe's House</b></td><td data-label="What it looks like">Narrow house with a slate at the door. Copies the door lantern into the window when the bell strikes.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2C5A92"></span>Storage</td><td data-label="Part">Register (per bit)</td><td data-label="NAND" class="num">10–13</td><td data-label="Building"><b>Notary Row</b></td><td data-label="What it looks like">Four to eight identical scribes on one bell lane, with a "load" pennant.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2C5A92"></span>Storage</td><td data-label="Part">RAM (16 × 4)</td><td data-label="NAND" class="num">≈1,000</td><td data-label="Building"><b>Archive Quarter</b></td><td data-label="What it looks like">Grid-planned quarter of chained-library houses. A Clerk of the Rolls at the gate decodes the address.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#6E3B7A"></span>Timing</td><td data-label="Part">Clock</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Belfry</b></td><td data-label="What it looks like">Tallest landmark, with violet bell lanes to every scribe.</td></tr></tbody></table></div>
+    <h4>Inspiration</h4>
+    <div class="gallery">
+      <figure><a class="ph" href="img/veloren-village.png"><img src="img/veloren-village.png" alt="Voxel village of timber-framed houses" loading="lazy" decoding="async"></a><figcaption><b>Old town of NAND houses.</b> Veloren's starting village: dense timber-framed voxel houses. Veloren is an open-source voxel game. <span class="credit">Veloren team and community; screenshot by PantheraLeo1359531 · <a href="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</a> · <a href="https://commons.wikimedia.org/wiki/File:Veloren_Screenshot_2023.02.09_-_16.12.11.63.png">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="https://store.steampowered.com/app/253250/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/253250/ss_6955c8fbeef65ae661f0f4bc43587769a6849112.600x338.jpg" alt="Voxel settlement with fields and houses at sunset" loading="lazy" decoding="async"></a><figcaption><b>District at diorama scale.</b> A voxel settlement with fields and houses in Stonehearth (2018). <span class="credit">© Radiant Entertainment · <a href="https://store.steampowered.com/app/253250/">Stonehearth page</a></span></figcaption></figure>
+      <figure><a class="ph" href="https://store.steampowered.com/app/227860/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/227860/ss_51b84fe588b9f1e91b780237fb4cd81782ac6612.600x338.jpg" alt="Voxel castle walls and towers under attack" loading="lazy" decoding="async"></a><figcaption><b>Walls as module boundaries.</b> Voxel curtain walls, towers and a gate in Castle Story (2017). <span class="credit">© Sauropod Studio · <a href="https://store.steampowered.com/app/227860/">Castle Story page</a></span></figcaption></figure>
+      <figure><a class="ph" href="https://store.steampowered.com/app/2198150/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2198150/ss_ed8d49e1bdc02b0c8caadb66e06b6d6ad6218c1f.600x338.jpg" alt="Dense small town seen from above" loading="lazy" decoding="async"></a><figcaption><b>Dense logic quarter.</b> Tiny Glade (2024) builds towns procedurally rather than from voxels, but its density fits the old town. <span class="credit">© Pounce Light · <a href="https://store.steampowered.com/app/2198150/">Tiny Glade page</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/castle-rushen-portcullis.jpg"><img src="img/castle-rushen-portcullis.jpg" alt="Stone gatehouse passage with a portcullis" loading="lazy" decoding="async"></a><figcaption><b>AND: Twin-Portcullis Gate.</b> The portcullis passage at Castle Rushen. Two in series means both must be raised. <span class="credit">Manxruler · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Castle_Rushen_gatehouse_entrance_and_portcullis.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/market-cross.jpg"><img src="img/market-cross.jpg" alt="Market cross monument at a town junction" loading="lazy" decoding="async"></a><figcaption><b>Fan-out: Market Cross.</b> A market cross at a junction: one lane in, several out. <span class="credit">Chris McAuley · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Market_Cross_(geograph_2293472).jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/chappe-tower.jpg"><img src="img/chappe-tower.jpg" alt="Stone tower topped with semaphore arms" loading="lazy" decoding="async"></a><figcaption><b>Buffer: Relay Tower.</b> A restored Chappe semaphore tower, the real relay that re-drove a signal down the line. <span class="credit">Erixsen · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Tour_Chappe_-_Saint_Marcan_-_Ille-et-Vilaine_-_France.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/lavenham-guildhall.jpg"><img src="img/lavenham-guildhall.jpg" alt="Timber-framed medieval guildhall" loading="lazy" decoding="async"></a><figcaption><b>ALU: Guildhall.</b> Lavenham's timber-framed guildhall. <span class="credit">Jonathan Thacker · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Lavenham_Guildhall_-_geograph.org.uk_-_4918699.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/hereford-chained-library.jpg"><img src="img/hereford-chained-library.jpg" alt="Wooden bookcases with chained books" loading="lazy" decoding="async"></a><figcaption><b>Register and RAM: the archive.</b> Hereford's chained library. The data stays where it is put. <span class="credit">Stuart Wilding · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:The_Chained_Library,_Hereford_Cathedral_-_geograph.org.uk_-_8173040.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/monpazier-aerial.jpg"><img src="img/monpazier-aerial.jpg" alt="Aerial view of a grid-planned medieval town" loading="lazy" decoding="async"></a><figcaption><b>RAM quarter.</b> Monpazier, a grid-planned bastide town: as regular as memory. <span class="credit">Mairiemonpazier · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Vue_a%C3%A9rienne_de_Monpazier.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/nordlingen-aerial.jpg"><img src="img/nordlingen-aerial.jpg" alt="Aerial view of a round walled town" loading="lazy" decoding="async"></a><figcaption><b>Module walls and ports.</b> The round walled town of Nördlingen. Its gates are the ports. <span class="credit">Bayerische Vermessungsverwaltung – www.geodaten.bayern.de · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:N%C3%B6rdlingen_Altstadt_Aerial.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/bruges-belfry.jpg"><img src="img/bruges-belfry.jpg" alt="Tall medieval belfry tower over a square" loading="lazy" decoding="async"></a><figcaption><b>Clock: the Belfry.</b> The belfry of Bruges, the town's landmark timekeeper. <span class="credit">Adiel lo · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Brugge_Belfort_HDR.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/wells-clock.jpg"><img src="img/wells-clock.jpg" alt="Ornate medieval astronomical clock dial" loading="lazy" decoding="async"></a><figcaption><b>Clock mechanism.</b> The medieval astronomical clock dial at Wells Cathedral. <span class="credit">DeFacto · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Wells_clock.jpg">Wikimedia Commons</a></span></figcaption></figure>
+    </div>
+    <h4>Real-world precedents</h4>
+    <ul class="prose">
+      <li><b>Byzantine beacons (9th century).</b> A chain of about 720 km to Constantinople, crossed in about an hour. Two synchronised water clocks meant each of the 12 hours stood for a different message: a clocked code <sup class="cite"><a href="#src-35" aria-label="Source 35">35</a></sup>.</li>
+      <li><b>Chappe semaphore.</b> Paris to Lille was about 230 km. The network grew to 556 stations over about 4,800 km, and the first symbol crossed 15 stations in 9 minutes <sup class="cite"><a href="#src-36" aria-label="Source 36">36</a></sup>. Relay towers re-drove the signal at each hop.</li>
+      <li><b>The Exchequer (around 1180).</b> Royal accounts were counted on a chequered cloth <sup class="cite"><a href="#src-37" aria-label="Source 37">37</a></sup>, hence the full adder's chequered roof.</li>
+      <li><b>Fiction and games.</b> In Liu Cixin's <i>The Three-Body Problem</i>, millions of soldiers holding flags act as a computer's gates <sup class="cite"><a href="#src-38" aria-label="Source 38">38</a></sup>. Rocky's Boots (1982) let players walk among gates and flip-flops <sup class="cite"><a href="#src-39" aria-label="Source 39">39</a></sup>.</li>
+      <li><b>Evidence for gates as gateways.</b> In Gentner and Gentner's study, people who pictured electricity as a crowd passing through gates did better on parallel resistors than people who pictured water: 93% against 63%. The groups were small, 5 to 7 people each <sup class="cite"><a href="#src-34" aria-label="Source 34">34</a></sup>.</li>
+    </ul>
+    <div class="risk">
+      <p><b>Misconception risk: "a signal is a messenger."</b> A messenger is in one place at a time and is gone once delivered, which makes fan-out seem impossible. A second risk is "gates wait for the bell".</p>
+      <p><b>Mitigation:</b> the lane is the signal, and runners only animate changes. An early puzzle lights five houses from one lane at once. The bell reaches only scribes.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-factory" role="tabpanel" aria-labelledby="tab-factory">
+    <h3>Line-Shaft Works (factory)</h3>
+    <p class="prose">A works from the 1920s to 1950s at dusk: brick sheds, steel gantries, painted safety colours, humming belts and status lamps, as orderly as rows of standard cells on a chip. Industry already colour-codes its pipes by what they carry (the ASME A13.1 standard) <sup class="cite"><a href="#src-40" aria-label="Source 40">40</a></sup>.</p>
+    <ul class="palette"><li><span class="chip" style="--c:#7E3A2C"></span><span><b>Brick</b><br><small>base · <code>#7E3A2C</code></small></span></li><li><span class="chip" style="--c:#C2BBAE"></span><span><b>Concrete</b><br><small>base · <code>#C2BBAE</code></small></span></li><li><span class="chip" style="--c:#5B6570"></span><span><b>Steel</b><br><small>routing · <code>#5B6570</code></small></span></li><li><span class="chip" style="--c:#D9532B"></span><span><b>Safety orange</b><br><small>logic · <code>#D9532B</code></small></span></li><li><span class="chip" style="--c:#3C8D5A"></span><span><b>Machine green</b><br><small>arithmetic · <code>#3C8D5A</code></small></span></li><li><span class="chip" style="--c:#2E6DB4"></span><span><b>Safety blue</b><br><small>storage · <code>#2E6DB4</code></small></span></li><li><span class="chip" style="--c:#7D4C9E"></span><span><b>Violet</b><br><small>timing · <code>#7D4C9E</code></small></span></li><li><span class="chip" style="--c:#FFC247"></span><span><b>Indicator amber</b><br><small>signal = 1 (only glowing colour) · <code>#FFC247</code></small></span></li></ul>
+    <h4>How it answers the four questions</h4>
+    <dl class="answers">
+      <dt>1 and 0</dt><dd>A belt is running with its lamp lit (1) or stopped and dark (0). Crates ride along only as a motion cue. They are never used up or counted.</dd>
+      <dt>NOT's supply</dt><dd>A line shaft runs from the Powerhouse along the north edge, with a belt drop to every machine. A NOT runs its output belt from the shaft unless its input belt is running, which disengages its clutch. The flooded power plant in the Cities: Skylines adder is the same idea <sup class="cite"><a href="#src-11" aria-label="Source 11">11</a></sup>.</dd>
+      <dt>Ground</dt><dd>A brake trench along the south edge.</dd>
+      <dt>Fan-out</dt><dd>Gearbox takeoffs. Each one loads the shaft. Past the limit, belts spin up slowly, so you add a Booster Motor.</dd>
+      <dt>Delay</dt><dd>Each machine's spin-up time plus belt length.</dd>
+      <dt>Clock</dt><dd>A whistle tower whose flywheel cam drives a violet strobe line. Only storage connects to it.</dd>
+    </dl>
+    <h4>Building ladder</h4>
+    <div class="table-wrap"><table class="stack ladder"><thead><tr><th>Category</th><th>Part</th><th class="num">NAND</th><th>Building</th><th>What it looks like</th></tr></thead><tbody><tr><td data-label="Category"><span class="sw" style="--c:#D9532B"></span>Logic</td><td data-label="Part">NOT</td><td data-label="NAND" class="num">1</td><td data-label="Building"><b>Clutch House</b></td><td data-label="What it looks like">Small shed with a flywheel and a belt drop from the mains shaft. The supply is visible.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#D9532B"></span>Logic</td><td data-label="Part">NAND</td><td data-label="NAND" class="num">1</td><td data-label="Building"><b>Standard Press</b></td><td data-label="What it looks like">Identical one-bay sheds in rows, like standard cells on a chip.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#D9532B"></span>Logic</td><td data-label="Part">AND</td><td data-label="NAND" class="num">2</td><td data-label="Building"><b>Two-Hand Press</b></td><td data-label="What it looks like">Press with two levers that must both be held: a real industrial safety AND.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#D9532B"></span>Logic</td><td data-label="Part">OR</td><td data-label="NAND" class="num">3</td><td data-label="Building"><b>Merge Hopper</b></td><td data-label="What it looks like">Hopper fed by two chutes.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#D9532B"></span>Logic</td><td data-label="Part">XOR</td><td data-label="NAND" class="num">4</td><td data-label="Building"><b>Mismatch Inspector</b></td><td data-label="What it looks like">Quality-control booth with a split lamp comparing two lines.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#5B6570"></span>Routing</td><td data-label="Part">Wire</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Conveyor</b></td><td data-label="What it looks like">One-voxel belt on trestles, with a status lamp every four tiles.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#5B6570"></span>Routing</td><td data-label="Part">Fan-out junction</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Line-shaft Gearbox</b></td><td data-label="What it looks like">Gearbox with several belts leaving. Each takeoff adds load.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#5B6570"></span>Routing</td><td data-label="Part">Buffer</td><td data-label="NAND" class="num">2</td><td data-label="Building"><b>Booster Motor</b></td><td data-label="What it looks like">Motor house partway along a long belt (+1 tick).</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#5B6570"></span>Routing</td><td data-label="Part">Crossing</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Conveyor Bridge</b></td><td data-label="What it looks like">Gantry carrying one belt over another.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#5B6570"></span>Routing</td><td data-label="Part">2:1 mux</td><td data-label="NAND" class="num">4</td><td data-label="Building"><b>Diverter Points</b></td><td data-label="What it looks like">Sorting flap with a selector lever, like a mail sorter.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#5B6570"></span>Routing</td><td data-label="Part">Bus</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Main Bus</b></td><td data-label="What it looks like">Four to eight parallel belts with painted lane numbers.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#3C8D5A"></span>Arithmetic</td><td data-label="Part">Half adder</td><td data-label="NAND" class="num">5</td><td data-label="Building"><b>Tally Counter Station</b></td><td data-label="What it looks like">Counter booth with Sum and Carry belts leaving.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#3C8D5A"></span>Arithmetic</td><td data-label="Part">Full adder</td><td data-label="NAND" class="num">9</td><td data-label="Building"><b>Carry Press</b></td><td data-label="What it looks like">Press with three inputs and a carry chute.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#3C8D5A"></span>Arithmetic</td><td data-label="Part">4-bit ripple adder</td><td data-label="NAND" class="num">36</td><td data-label="Building"><b>Assembly Line</b></td><td data-label="What it looks like">Four stations in a row passing the carry along, Ford-style.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#3C8D5A"></span>Arithmetic</td><td data-label="Part">ALU</td><td data-label="NAND" class="num">≈140</td><td data-label="Building"><b>Machine Shop</b></td><td data-label="What it looks like">Hall with a Jacquard-style job-card reader that sets the operation.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2E6DB4"></span>Storage</td><td data-label="Part">SR latch</td><td data-label="NAND" class="num">2</td><td data-label="Building"><b>Lever Cabinet</b></td><td data-label="What it looks like">SET and RESET levers. The lamp stays on after SET until RESET.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2E6DB4"></span>Storage</td><td data-label="Part">D flip-flop</td><td data-label="NAND" class="num">6–9</td><td data-label="Building"><b>Sampling Hopper</b></td><td data-label="What it looks like">Hopper whose gate opens only at the whistle.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2E6DB4"></span>Storage</td><td data-label="Part">Register (per bit)</td><td data-label="NAND" class="num">10–13</td><td data-label="Building"><b>Bin Row</b></td><td data-label="What it looks like">Row of bins on one strobe line.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#2E6DB4"></span>Storage</td><td data-label="Part">RAM (16 × 4)</td><td data-label="NAND" class="num">≈1,000</td><td data-label="Building"><b>High-Bay Warehouse</b></td><td data-label="What it looks like">Racks served by a stacker crane that goes to a row and column: the address.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#7D4C9E"></span>Timing</td><td data-label="Part">Clock</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Whistle Tower</b></td><td data-label="What it looks like">Chimney with a whistle and a big cam flywheel driving the violet strobe line.</td></tr></tbody></table></div>
+    <h4>Inspiration</h4>
+    <div class="gallery">
+      <figure><a class="ph" href="https://store.steampowered.com/app/983870/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/983870/424266f2cb9a27e52643ed9c92e4550710bfbdde/ss_424266f2cb9a27e52643ed9c92e4550710bfbdde.600x338.jpg" alt="Rows of conveyor belts between machines in a voxel world" loading="lazy" decoding="async"></a><figcaption><b>Wires and buses.</b> Rows of conveyors between machines in FOUNDRY (2024), a voxel factory game. <span class="credit">© Channel 3 Entertainment / Paradox · <a href="https://store.steampowered.com/app/983870/">FOUNDRY page</a></span></figcaption></figure>
+      <figure><a class="ph" href="https://store.steampowered.com/app/983870/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/983870/ef30693449244856f1a98f1d935ca3076c0f7f18/ss_ef30693449244856f1a98f1d935ca3076c0f7f18.600x338.jpg" alt="Factory at night with glowing belts and cooling towers" loading="lazy" decoding="async"></a><figcaption><b>Glow for state.</b> A night works with glowing belts in FOUNDRY. <span class="credit">© Channel 3 Entertainment / Paradox · <a href="https://store.steampowered.com/app/983870/">FOUNDRY page</a></span></figcaption></figure>
+      <figure><a class="ph" href="https://store.steampowered.com/app/300570/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/300570/ss_b5dc8cd012171e5b404e9c52cb5cd5eaafe41a8f.600x338.jpg" alt="Blocky conveyor factory bay" loading="lazy" decoding="async"></a><figcaption><b>Belts and blocks.</b> A blocky conveyor bay in Infinifactory (2015). <span class="credit">© Zachtronics · <a href="https://store.steampowered.com/app/300570/">Infinifactory page</a></span></figcaption></figure>
+      <figure><a class="ph" href="https://store.steampowered.com/app/300570/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/300570/ss_213e50c3411ccfd63f06cee22622b3d941891f4d.600x338.jpg" alt="Holographic blueprint over a factory floor" loading="lazy" decoding="async"></a><figcaption><b>Overlay precedent.</b> Infinifactory's holographic blueprint floating over the factory. <span class="credit">© Zachtronics · <a href="https://store.steampowered.com/app/300570/">Infinifactory page</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/zuse-z1.jpg"><img src="img/zuse-z1.jpg" alt="Stacked layers of metal plates in a mechanical computer" loading="lazy" decoding="async"></a><figcaption><b>NAND: Standard Press.</b> The Zuse Z1 replica: logic as stacked sliding plates. <span class="credit">Alex J. Lowry from Scotland · <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a> · <a href="https://commons.wikimedia.org/wiki/File:Zuse_Z1_Replica,_Berlin_-_Flickr_-_AlexJLowry.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/post-sorting.jpg"><img src="img/post-sorting.jpg" alt="Letter-sorting machine with belts and diverters" loading="lazy" decoding="async"></a><figcaption><b>Mux: Diverter Points.</b> A letter-sorting machine, belts and diverters picking a route. <span class="credit">Milestoned from Deutschland(Germany) · <a href="https://creativecommons.org/licenses/by/2.0">CC BY 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Post_Sorting_Machine_(4479045801).jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/ford-line-1913.jpg"><img src="img/ford-line-1913.jpg" alt="Workers along an early car assembly line" loading="lazy" decoding="async"></a><figcaption><b>Ripple adder: Assembly Line.</b> Ford's assembly line in 1913. The carry passes from station to station. <span class="credit">Unknown author · Public domain · <a href="https://commons.wikimedia.org/wiki/File:Ford_assembly_line_-_1913.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/jacquard-loom.jpg"><img src="img/jacquard-loom.jpg" alt="Jacquard loom with a long chain of punched cards" loading="lazy" decoding="async"></a><figcaption><b>ALU: Machine Shop.</b> A Jacquard loom's punched-card chain, the model for the operation-card reader. <span class="credit">Stephencdickson · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:A_Jacquard_loom_showing_information_punchcards,_National_Museum_of_Scotland.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/turing-tumble.jpg"><img src="img/turing-tumble.jpg" alt="Toy board with blue marbles and plastic bit flippers" loading="lazy" decoding="async"></a><figcaption><b>Register bits.</b> A Turing Tumble board, where marbles flip bits. <span class="credit">Pgboswell · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Turing_Tumble_game_board.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/high-bay-warehouse.jpg"><img src="img/high-bay-warehouse.jpg" alt="Tall automated warehouse racks with cranes" loading="lazy" decoding="async"></a><figcaption><b>RAM: High-Bay Warehouse.</b> Automated racks with stacker cranes that go to a row and column. <span class="credit">Gilgen Logistics AG · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Automatisches_Hochregallager_mit_Regalbedienger%C3%A4ten.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/strowger-exchange.jpg"><img src="img/strowger-exchange.jpg" alt="Racks of electromechanical telephone switches" loading="lazy" decoding="async"></a><figcaption><b>Address decoder.</b> A Strowger step-by-step telephone exchange, selecting a line one digit at a time. <span class="credit">Darklanlan · <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:NTT_strowger_telephone_exchange.jpg">Wikimedia Commons</a></span></figcaption></figure>
+    </div>
+    <h4>Real-world precedents</h4>
+    <ul class="prose">
+      <li><b>Zuse Z1 (1936–38).</b> Logic from sliding sheet-metal plates at about 1 Hz, with 22-bit floating point and 16 words of memory, weighing about a tonne. A replica was built in 1989 and is in Berlin <sup class="cite"><a href="#src-41" aria-label="Source 41">41</a></sup>.</li>
+      <li><b>Railway interlocking</b> (from 1843; Saxby's patent in 1856). Locking bars physically stop conflicting levers from moving: logic in steel <sup class="cite"><a href="#src-42" aria-label="Source 42">42</a></sup>.</li>
+      <li><b>Relay ladder logic and the PLC.</b> GM's Hydra-Matic division asked for a replacement for relay panels in 1968, and the Modicon 084 followed in 1969. Ladder diagrams were drawn to look like relay schematics <sup class="cite"><a href="#src-43" aria-label="Source 43">43</a></sup>.</li>
+      <li><b>Turing Tumble.</b> Marbles flip bits; an extended version of the board was proven Turing complete <sup class="cite"><a href="#src-44" aria-label="Source 44">44</a></sup>.</li>
+      <li><b>Factorio.</b> Combinators add one tick of delay each <sup class="cite"><a href="#src-19" aria-label="Source 19">19</a></sup>, and players invented the "main bus" layout to keep big factories readable <sup class="cite"><a href="#src-45" aria-label="Source 45">45</a></sup>.</li>
+    </ul>
+    <div class="risk">
+      <p><b>Misconception risk: "reading a signal uses it up."</b> That is what happens when crates <em>are</em> the signal, as in Factorio and shapez: reading consumes it, fan-out needs duplicators, and belts back up. Real wires do none of this.</p>
+      <p><b>Mitigation:</b> a running belt is the level, crates are decoration, and wires never queue.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-organic" role="tabpanel" aria-labelledby="tab-organic">
+    <h3>Glow Reef (organic)</h3>
+    <p class="prose">A bioluminescent night garden on a reef. Everything is grown, but roots are trained flat along a trellis (espalier) so routing stays straight. Use one organism family per scale: roots and hyphae for wires, polyps and fungi for gates, comb and pods for memory, the tide for the clock. Mixing coral, mycelium and hive at the same scale turns into soup.</p>
+    <ul class="palette"><li><span class="chip" style="--c:#0F1E2C"></span><span><b>Abyss</b><br><small>base · <code>#0F1E2C</code></small></span></li><li><span class="chip" style="--c:#5A4632"></span><span><b>Bark</b><br><small>base · <code>#5A4632</code></small></span></li><li><span class="chip" style="--c:#E6D9BF"></span><span><b>Pale root</b><br><small>routing · <code>#E6D9BF</code></small></span></li><li><span class="chip" style="--c:#E0736A"></span><span><b>Coral</b><br><small>logic · <code>#E0736A</code></small></span></li><li><span class="chip" style="--c:#6E8B3D"></span><span><b>Moss</b><br><small>arithmetic · <code>#6E8B3D</code></small></span></li><li><span class="chip" style="--c:#E2A23B"></span><span><b>Honey</b><br><small>storage · <code>#E2A23B</code></small></span></li><li><span class="chip" style="--c:#7B62C9"></span><span><b>Tide violet</b><br><small>timing · <code>#7B62C9</code></small></span></li><li><span class="chip" style="--c:#7CF5E0"></span><span><b>Glow cyan</b><br><small>signal = 1 (only glowing colour) · <code>#7CF5E0</code></small></span></li></ul>
+    <h4>How it answers the four questions</h4>
+    <dl class="answers">
+      <dt>1 and 0</dt><dd>A root glows (1) or is dark (0). Brighter ripples only show a change passing.</dd>
+      <dt>NOT's supply</dt><dd>A nutrient vein from the sunlit canopy runs along the north edge, with a feeder root to every polyp. A NOT glows from its feeder unless its input inhibits it. In biology NOT really is repression: Cello's genetic gates are built from repressors <sup class="cite"><a href="#src-46" aria-label="Source 46">46</a></sup>.</dd>
+      <dt>Ground</dt><dd>Sediment along the south edge. Glow fades unless fed, so an unconnected input visibly withers, which is a way to teach floating inputs.</dd>
+      <dt>Fan-out</dt><dd>Hyphae branch freely, but each branch dilutes the glow, so you add a Spore Lamp.</dd>
+      <dt>Delay</dt><dd>Growth and diffusion, compressed into ticks. Real chemical "wires" between bacteria take hours <sup class="cite"><a href="#src-47" aria-label="Source 47">47</a></sup>. Long roots are slow.</dd>
+      <dt>Clock</dt><dd>A pulsing Lantern Jelly in a tide pool feeds violet tide channels. Only storage samples them.</dd>
+      <dt>Rule</dt><dd>Once placed, roots never grow or thicken. Real slime mould reinforces its busiest tubes <sup class="cite"><a href="#src-48" aria-label="Source 48">48</a></sup>; the game must not, or circuits will seem to learn.</dd>
+    </dl>
+    <h4>Building ladder</h4>
+    <div class="table-wrap"><table class="stack ladder"><thead><tr><th>Category</th><th>Part</th><th class="num">NAND</th><th>Building</th><th>What it looks like</th></tr></thead><tbody><tr><td data-label="Category"><span class="sw" style="--c:#E0736A"></span>Logic</td><td data-label="Part">NOT</td><td data-label="NAND" class="num">1</td><td data-label="Building"><b>Shy Polyp</b></td><td data-label="What it looks like">Single polyp with a glowing tip on a feeder root. Glows unless inhibited.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E0736A"></span>Logic</td><td data-label="Part">NAND</td><td data-label="NAND" class="num">1</td><td data-label="Building"><b>Reef Polyp</b></td><td data-label="What it looks like">Clusters of identical coral heads: many identical units, one universal block.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E0736A"></span>Logic</td><td data-label="Part">AND</td><td data-label="NAND" class="num">2</td><td data-label="Building"><b>Twin-root Mushroom</b></td><td data-label="What it looks like">Fruits only when fed by two hyphae.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E0736A"></span>Logic</td><td data-label="Part">OR</td><td data-label="NAND" class="num">3</td><td data-label="Building"><b>Moss Cushion</b></td><td data-label="What it looks like">Moss pad fed by two roots.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E0736A"></span>Logic</td><td data-label="Part">XOR</td><td data-label="NAND" class="num">4</td><td data-label="Building"><b>Rival Blooms</b></td><td data-label="What it looks like">Two blooms on one stem that inhibit each other.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E6D9BF"></span>Routing</td><td data-label="Part">Wire</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Glow Root</b></td><td data-label="What it looks like">Pale root trained flat along a trellis.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E6D9BF"></span>Routing</td><td data-label="Part">Fan-out junction</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Root Knot</b></td><td data-label="What it looks like">Thick branching node where the glow divides.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E6D9BF"></span>Routing</td><td data-label="Part">Buffer</td><td data-label="NAND" class="num">2</td><td data-label="Building"><b>Spore Lamp</b></td><td data-label="What it looks like">Mushroom that re-emits the glow (+1 tick).</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E6D9BF"></span>Routing</td><td data-label="Part">Crossing</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Living Root Bridge</b></td><td data-label="What it looks like">Root arching over another, with no connection.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E6D9BF"></span>Routing</td><td data-label="Part">2:1 mux</td><td data-label="NAND" class="num">4</td><td data-label="Building"><b>Ant Fork</b></td><td data-label="What it looks like">Trail fork with a pheromone marker on the chosen branch.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E6D9BF"></span>Routing</td><td data-label="Part">Bus</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Rhizomorph Cord</b></td><td data-label="What it looks like">Braided bundle of hyphae, one strand per bit.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#6E8B3D"></span>Arithmetic</td><td data-label="Part">Half adder</td><td data-label="NAND" class="num">5</td><td data-label="Building"><b>Twin Seedpod</b></td><td data-label="What it looks like">Two-chambered pod: Sum and Carry.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#6E8B3D"></span>Arithmetic</td><td data-label="Part">Full adder</td><td data-label="NAND" class="num">9</td><td data-label="Building"><b>Brood Chamber</b></td><td data-label="What it looks like">Rounded termite chamber.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#6E8B3D"></span>Arithmetic</td><td data-label="Part">4-bit ripple adder</td><td data-label="NAND" class="num">36</td><td data-label="Building"><b>Coral Ridge</b></td><td data-label="What it looks like">Four chambers along a ridge, the carry glowing from one to the next.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#6E8B3D"></span>Arithmetic</td><td data-label="Part">ALU</td><td data-label="NAND" class="num">≈140</td><td data-label="Building"><b>Termite Cathedral</b></td><td data-label="What it looks like">Tall vented mound whose cap colour shows the operation.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E2A23B"></span>Storage</td><td data-label="Part">SR latch</td><td data-label="NAND" class="num">2</td><td data-label="Building"><b>Snap Pod</b></td><td data-label="What it looks like">Snaps open (set) and stays open until shut (reset).</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E2A23B"></span>Storage</td><td data-label="Part">D flip-flop</td><td data-label="NAND" class="num">6–9</td><td data-label="Building"><b>Tide Clam</b></td><td data-label="What it looks like">Opens only on the tide.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E2A23B"></span>Storage</td><td data-label="Part">Register (per bit)</td><td data-label="NAND" class="num">10–13</td><td data-label="Building"><b>Lotus Pod</b></td><td data-label="What it looks like">Seed head with four to eight cells in a row. A glowing seed is a 1.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#E2A23B"></span>Storage</td><td data-label="Part">RAM (16 × 4)</td><td data-label="NAND" class="num">≈1,000</td><td data-label="Building"><b>Honeycomb</b></td><td data-label="What it looks like">Hex grid of cells with a worker "crane" that finds the address.</td></tr>
+<tr><td data-label="Category"><span class="sw" style="--c:#7B62C9"></span>Timing</td><td data-label="Part">Clock</td><td data-label="NAND" class="num">—</td><td data-label="Building"><b>Lantern Jelly</b></td><td data-label="What it looks like">Large pulsing jelly in a tide pool.</td></tr></tbody></table></div>
+    <h4>Inspiration</h4>
+    <p class="prose">No strong organic voxel game turned up. Cloud Gardens is low-poly, and Block'hood (above) is the nearest voxel ecology game.</p>
+    <div class="gallery">
+      <figure><a class="ph" href="https://store.steampowered.com/app/1372320/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1372320/ss_25ed0d5811d280fe2407e7ff1ee61de8ef7b4e8d.600x338.jpg" alt="Floating overgrown diorama with a lamp post" loading="lazy" decoding="async"></a><figcaption><b>Overgrown diorama.</b> Cloud Gardens (2021): plants taking over small floating scenes. <span class="credit">© Noio · <a href="https://store.steampowered.com/app/1372320/">Cloud Gardens page</a></span></figcaption></figure>
+      <figure><a class="ph" href="https://store.steampowered.com/app/1372320/"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1372320/ss_0e89305059df6e26e8550533ad8a586ab9ecfd6c.600x338.jpg" alt="Vines climbing utility poles and wires" loading="lazy" decoding="async"></a><figcaption><b>Vine as wire.</b> Vines climbing poles and cables in Cloud Gardens. <span class="credit">© Noio · <a href="https://store.steampowered.com/app/1372320/">Cloud Gardens page</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/physarum-network.jpg"><img src="img/physarum-network.jpg" alt="Yellow slime mould spreading as a network between food sources" loading="lazy" decoding="async"></a><figcaption><b>Layout as network.</b> Slime mould growing a network like Tokyo's rail map over 26 hours. <span class="credit">Tim Tim (VD fr) · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Physarum_polycephalum_network.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/physarum.jpg"><img src="img/physarum.jpg" alt="Close-up of yellow slime mould veins" loading="lazy" decoding="async"></a><figcaption><b>Wire: Glow Root.</b> Physarum veins: wires that are alive. <span class="credit">HelenGinger · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Physarum_polycephalum.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/hyphae.jpg"><img src="img/hyphae.jpg" alt="White fungal threads spreading over soil" loading="lazy" decoding="async"></a><figcaption><b>Bus: Rhizomorph Cord.</b> White hyphae on soil, the raw material for bundled wires. <span class="credit">TheAlphaWolf · <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Hyphae.JPG">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/root-bridge.jpg"><img src="img/root-bridge.jpg" alt="Two-level bridge made of living tree roots over a stream" loading="lazy" decoding="async"></a><figcaption><b>Crossing: Living Root Bridge.</b> A two-level living root bridge at Nongriat, Meghalaya. <span class="credit">PJeganathan · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Living_root_bridges_of_Nongriat_village_in_East_Khasi_Hills_district,_Meghalaya_JEG7387.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/panellus.jpg"><img src="img/panellus.jpg" alt="Small mushrooms glowing green in the dark" loading="lazy" decoding="async"></a><figcaption><b>Signal = glow.</b> The bioluminescent fungus <i>Panellus stipticus</i>. <span class="credit">Ylem · Public domain · <a href="https://commons.wikimedia.org/wiki/File:PanellusStipticusAug12_2009.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/coral-outcrop.jpg"><img src="img/coral-outcrop.jpg" alt="Coral outcrop on a reef" loading="lazy" decoding="async"></a><figcaption><b>NAND: Reef Polyp district.</b> A coral outcrop on the Great Barrier Reef. <span class="credit">Toby Hudson · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Coral_Outcrop_Flynn_Reef.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/termite-mound.jpg"><img src="img/termite-mound.jpg" alt="Tall spired termite mound" loading="lazy" decoding="async"></a><figcaption><b>ALU: Termite Cathedral.</b> A cathedral termite mound, the district's landmark. <span class="credit">J Brew · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Cathedral_Termite_Mound_-_brewbooks.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/lotus-pod.jpg"><img src="img/lotus-pod.jpg" alt="Lotus seed head with a grid of seed cells" loading="lazy" decoding="async"></a><figcaption><b>Register: Lotus Pod.</b> A lotus seed head: a row of cells, each holding one seed. <span class="credit">Krishna satya 333 · <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a> · <a href="https://commons.wikimedia.org/wiki/File:Seed_pod_of_lotus_flower.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <figure><a class="ph" href="img/honeycomb.jpg"><img src="img/honeycomb.jpg" alt="Honeycomb cells with eggs and brood" loading="lazy" decoding="async"></a><figcaption><b>RAM: Honeycomb.</b> Comb cells with eggs and brood: addressed storage. <span class="credit">Waugsberg · <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Bienenwabe_mit_Eiern_und_Brut_5.jpg">Wikimedia Commons</a></span></figcaption></figure>
+    </div>
+    <h4>Real-world precedents</h4>
+    <ul class="prose">
+      <li><b>Bacterial NOR gates with chemical wires</b> (Tamsir, Tabor and Voigt, <i>Nature</i>, 2011). Each gate was a separate <i>E. coli</i> strain and signalling molecules were the wires. Every two-input function, including XOR, was built by arranging colonies in space <sup class="cite"><a href="#src-47" aria-label="Source 47">47</a></sup>. This is the closest real case of layout as circuit.</li>
+      <li><b>Cello (2016)</b> compiles a hardware description (Verilog) into DNA. Of 60 circuits, 45 were correct in every output state <sup class="cite"><a href="#src-46" aria-label="Source 46">46</a></sup>.</li>
+      <li><b>Slime mould.</b> Adamatzky (2010) built AND and OR gates from Physarum, with a half adder shown only in simulation <sup class="cite"><a href="#src-49" aria-label="Source 49">49</a></sup>. Tero et al. (2010) grew a network that matched Tokyo's railways <sup class="cite"><a href="#src-48" aria-label="Source 48">48</a></sup>.</li>
+      <li><b>Fungal gates.</b> Roberts and Adamatzky (2022) found many-input Boolean functions in oyster-mushroom mycelium <sup class="cite"><a href="#src-50" aria-label="Source 50">50</a></sup>.</li>
+      <li><b>Honeybee stop signals.</b> Scouts inhibit rival scouts so the swarm doesn't deadlock <sup class="cite"><a href="#src-51" aria-label="Source 51">51</a></sup>. Cross-inhibition is how an SR latch works.</li>
+      <li><b>The Venus flytrap counts</b> the electrical signals that touches trigger <sup class="cite"><a href="#src-52" aria-label="Source 52">52</a></sup>.</li>
+    </ul>
+    <div class="risk">
+      <p><b>Misconception risk: "circuits grow, adapt and learn, and behave fuzzily."</b> Also, this theme's source domain (inhibition and repression) is the least familiar of the three, and an analogy only helps when people already understand its source.</p>
+      <p><b>Mitigation:</b> growth happens only at build time, there are exactly two glow levels, and thresholds are fixed.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="other">
+  <h2 id="other">Other themes, in brief</h2>
+  <p class="prose">The first research pass turned up three more themes. They map more faithfully to electricity, but for now they get a card each.</p>
+  <div class="cards">
+    <div class="card">
+      <figure><a class="ph" href="img/phillips-machine.jpg"><img src="img/phillips-machine.jpg" alt="Tall hydraulic machine of clear tubes and tanks" loading="lazy" decoding="async"></a><figcaption><b>MONIAC, the Phillips Machine.</b> A hydraulic computer that modelled the economy with water, shown restored in 1993. <span class="credit">LSE Library · <a href="https://www.flickr.com/commons/usage/">No restrictions</a> · <a href="https://commons.wikimedia.org/wiki/File:Restored_Phillips_Machine,_1993_(3990093924).jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <div class="body">
+        <h3>Waterworks</h3>
+        <p>Signal = water pressure, wire = pipe, NOT = a pump fed from a reservoir main, latch = a tank that refills itself, clock = a water wheel. The strongest physical fit: real fluidic gates exist, and water explains supply, pressure drop on fan-out and fill-time delay. The risk is that it suggests flowing current, when logic is about levels.</p>
+      </div>
+    </div>
+    <div class="card">
+      <figure><a class="ph" href="img/signal-frame-1928.jpg"><img src="img/signal-frame-1928.jpg" alt="Railway signal box with a row of levers and a track diagram above" loading="lazy" decoding="async"></a><figcaption><b>Blackfriars Junction signal frame (1928).</b> The track diagram hangs above the levers: a schematic overlay in real life. <span class="credit">Andy Dingley (scanner) · Public domain · <a href="https://commons.wikimedia.org/wiki/File:Electric_signal_frame,_Blackfriars_Junction,_Southern_Railway_(CJ_Allen,_Steel_Highway,_1928).jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <div class="body">
+        <h3>Railway</h3>
+        <p>Signal = a train on the track, gate = a signal box, memory = a loop siding, clock = the timetable bell. Great for delay, critical paths, contention and buses. Weak on fan-out: a train can't split in two.</p>
+      </div>
+    </div>
+    <div class="card">
+      <figure><a class="ph" href="img/harwell-dekatron.jpg"><img src="img/harwell-dekatron.jpg" alt="Rows of glowing neon counting tubes in an old computer" loading="lazy" decoding="async"></a><figcaption><b>Harwell Dekatron computer.</b> Neon tubes that store digits and glow while they do. <span class="credit">BadgersCP · <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a> · <a href="https://commons.wikimedia.org/wiki/File:Harwell_Dekatron_TNMOC-CP.jpg">Wikimedia Commons</a></span></figcaption></figure>
+      <div class="body">
+        <h3>Neon power grid</h3>
+        <p>Signal = current, gate = a substation, memory = a window that stays lit, clock = a lighthouse sweep. The most electrically faithful, but it adds the least, because the metaphor is nearly the thing itself.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="against">
+  <h2 id="against">The case against</h2>
+  <p class="prose">The two choices made so far, symbolic buildings and the three less electrically faithful themes, are the two the research flags as riskiest. Here is the strongest case against them.</p>
+  <ul class="prose">
+    <li><b>The theme becomes decoration or a weak analogy.</b> If the layout carries the schematic, the theme is decoration competing for attention. If the theme carries meaning, it is the weaker analogy.</li>
+    <li><b>Decoration usually costs a little.</b> Across studies, interesting but irrelevant extras ("seductive details") lower learning on average: d = 0.30 for retention across 34 studies and d = 0.48 for transfer across 21. Study by study, though, only 11 of 39 fully showed the effect, 13 were mixed and 15 found none. A 2020 meta-analysis of 58 papers put the cost at g ≈ −0.37 to −0.41 <sup class="cite"><a href="#src-53" aria-label="Source 53">53</a></sup>.</li>
+    <li><b>An analogy only helps if people already know its source.</b> In Gentner and Gentner's study, the water model failed on batteries because people didn't understand reservoirs in series <sup class="cite"><a href="#src-34" aria-label="Source 34">34</a></sup>. Lit lanes pass this test, line shafts are doubtful, and inhibition and repression fail it.</li>
+    <li><b>The best city evidence is about something else.</b> CodeCity's result (41 participants) came from experienced developers navigating existing code, measured by the tool's own authors <sup class="cite"><a href="#src-3" aria-label="Source 3">3</a></sup>. That is not novices learning a formal notation. Memory palaces help people memorise lists (g = 0.65 across 13 trials, with a high risk of bias), which is memorising, not understanding <sup class="cite"><a href="#src-54" aria-label="Source 54">54</a></sup>.</li>
+    <li><b>Concrete examples can block transfer.</b> Whether concrete examples help or hurt the move to abstract notation is contested <sup class="cite"><a href="#src-55" aria-label="Source 55">55</a></sup>. Evidence that games teach digital logic is thin, mostly single-group before-and-after tests and self-reports <sup class="cite"><a href="#src-56" aria-label="Source 56">56</a></sup>.</li>
+  </ul>
+  <p class="prose"><b>In its favour:</b> symbolic buildings make the layout the fixed part, so themes can be swapped and compared cheaply. And building the content into the core mechanic, rather than wrapping it in a theme, has some support <sup class="cite"><a href="#src-57" aria-label="Source 57">57</a></sup>.</p>
+
+  <h3>Risks</h3>
+  <div class="table-wrap">
+  <table class="stack">
+    <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td data-label="Risk">Scope: 3 themes × about 20 building kits × lit and unlit states</td><td data-label="Likelihood">High</td><td data-label="Impact">High</td><td data-label="Mitigation">Ship one theme first.</td></tr>
+      <tr><td data-label="Risk">Voxel buildings unreadable when zoomed out</td><td data-label="Likelihood">Medium</td><td data-label="Impact">High</td><td data-label="Mitigation">Silhouette first, roof colour, districts collapse into blocks.</td></tr>
+      <tr><td data-label="Risk">About 1,300 NAND lots are tedious to place and read</td><td data-label="Likelihood">High</td><td data-label="Impact">Medium</td><td data-label="Mitigation">Encapsulation: a finished district becomes one block.</td></tr>
+      <tr><td data-label="Risk">An animated figure for every signal change slows the game</td><td data-label="Likelihood">Medium</td><td data-label="Impact">Medium</td><td data-label="Mitigation">Animate only on change, with less detail at a distance.</td></tr>
+      <tr><td data-label="Risk">Players skip the overlay and never carry it over to real schematics</td><td data-label="Likelihood">Medium to high</td><td data-label="Impact">High</td><td data-label="Mitigation">Puzzles answered in schematic or truth-table form; the slider.</td></tr>
+      <tr><td data-label="Risk">Two buildings driving one street, or players reading districts as wiring</td><td data-label="Likelihood">Medium</td><td data-label="Impact">Medium</td><td data-label="Mitigation">One driver per street; the overlay shows true connections across walls.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>What would have to be true</h3>
+  <ul class="prose">
+    <li>The city and the schematic are exactly equivalent, so the overlay never lies.</li>
+    <li>The rule that a signal is a level holds in every theme.</li>
+    <li>Each theme's source domain is already familiar to players.</li>
+    <li>Players regularly translate what they see into schematic form.</li>
+    <li>One theme's art fits a small budget.</li>
+    <li>Most important: after playing, people read unseen standard schematics faster or more accurately than people who played NandGame or Digital Logic Sim.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="next">
+  <h2 id="next">What to try next, cheapest first</h2>
+  <ol class="prose">
+    <li><b>Paper city (1 day).</b> Draw the same 4-bit adder as a schematic and as each theme's map. Have five people think aloud while tracing 0101 + 0011, and record time and errors.</li>
+    <li><b>Misconception probes (same session).</b> Six questions: fan-out, NOT's supply, two drivers on one street, what the clock does, unconnected inputs, and delay against chain length.</li>
+    <li><b>One-week transfer check.</b> Show an unseen multiplexer or SR-latch schematic and ask what it does.</li>
+    <li><b>Slider prototype (2–3 days).</b> A flat 2D HTML version of the city-to-schematic slider. Log how often people use it.</li>
+    <li><b>Art test.</b> One category kit per theme in MagicaVoxel, a day each. Check it at three zoom levels and through a colour-blindness simulator.</li>
+    <li><b>Simulation test.</b> A 1,300-gate NAND simulation in JavaScript that only updates gates when an input changes.</li>
+  </ol>
+
+  <h3>Open questions</h3>
+  <ul class="prose">
+    <li>Level or token: should the signal be a lit lane (recommended) or a runner? The misconception probes would tell.</li>
+    <li>Should footprint really grow with NAND cost, or would a 1,000-lot RAM quarter dwarf everything else?</li>
+    <li>What should feedback lanes look like?</li>
+    <li>At what zoom do NAND houses collapse into blocks?</li>
+    <li>Should the schematic view keep the city's geometry, or straighten it like Beck's map?</li>
+    <li>For Glow Reef: one organism family throughout, or one per scale?</li>
+  </ul>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Sources</h2>
+  <ol class="sources"><li id="src-1">Inquirer Technology, "Computer chip close-ups reminiscent of big cities" (Christoph Morlinghaus photographs). <a href="https://technology.inquirer.net/51259/computer-chip-close-ups-reminiscent-of-big-cities">technology.inquirer.net/51259/computer-chip-close-ups-reminiscent-of-big-cities</a></li>
+<li id="src-2">Centre for Computing History, "The Megaprocessor". <a href="https://www.computinghistory.org.uk/det/43063/The-Megaprocessor/">www.computinghistory.org.uk/det/43063/The-Megaprocessor</a></li>
+<li id="src-3">Wettel, Lanza &amp; Robbes (2011), "Software Systems as Cities: A Controlled Experiment", ICSE 2011. <a href="https://2011.icse-conferences.org/content/software-systems-cities-controlled-experiment.html">2011.icse-conferences.org/content/software-systems-cities-controlled-experiment.html</a></li>
+<li id="src-4">Turing Complete on Steam (LevelHead). <a href="https://store.steampowered.com/app/1444480/">store.steampowered.com/app/1444480</a></li>
+<li id="src-5">Logic World on Steam (Mouse Hat Games). <a href="https://store.steampowered.com/app/1054340/">store.steampowered.com/app/1054340</a></li>
+<li id="src-6">Voxel Tycoon on Steam. <a href="https://store.steampowered.com/app/732050/">store.steampowered.com/app/732050</a></li>
+<li id="src-7">Software Engineering Daily (2025), "Teardown and Voxel-Based Rendering with Dennis Gustafsson". <a href="https://softwareengineeringdaily.com/2025/01/02/teardown-and-voxel-based-rendering-with-dennis-gustafsson/">softwareengineeringdaily.com/2025/01/02/teardown-and-voxel-based-rendering-with-dennis-gustafsson</a></li>
+<li id="src-8">Block'hood on Steam (Plethora Project). <a href="https://store.steampowered.com/app/416210/">store.steampowered.com/app/416210</a></li>
+<li id="src-9">MagicaVoxel (ephtracy). <a href="https://ephtracy.github.io/">ephtracy.github.io</a></li>
+<li id="src-10">Mini Metro on Steam (Dinosaur Polo Club). <a href="https://store.steampowered.com/app/287980/">store.steampowered.com/app/287980</a></li>
+<li id="src-11">Daniel Bali (2019), "Cities: Skylines is Turing Complete". <a href="https://medium.com/@balidani/cities-skylines-is-turing-complete-e5ccf75d1c3a">medium.com/@balidani/cities-skylines-is-turing-complete-e5ccf75d1c3a</a></li>
+<li id="src-12">OSnews (17 July 2019), "Cities: Skylines is Turing complete". <a href="https://www.osnews.com/story/130333/cities-skylines-is-turing-complete/">www.osnews.com/story/130333/cities-skylines-is-turing-complete</a></li>
+<li id="src-13">ASEE 2024 Annual Conference paper on using Turing Complete in digital-logic courses. <a href="https://peer.asee.org/45615">peer.asee.org/45615</a></li>
+<li id="src-14">Hackaday (2018), "Build a fun CPU in your browser" (NandGame). <a href="https://hackaday.com/2018/08/20/build-a-fun-cpu-in-your-browser/">hackaday.com/2018/08/20/build-a-fun-cpu-in-your-browser</a></li>
+<li id="src-15">Sebastian Lague, Digital Logic Sim (GitHub). <a href="https://github.com/SebLague/Digital-Logic-Sim">github.com/SebLague/Digital-Logic-Sim</a></li>
+<li id="src-16">Oxygen Not Included wiki, "Logic gates". <a href="https://oxygennotincluded.wiki.gg/wiki/Logic_gates">oxygennotincluded.wiki.gg/wiki/Logic_gates</a></li>
+<li id="src-17">Minecraft wiki, "Redstone Torch". <a href="https://minecraft-archive.fandom.com/wiki/Redstone_Torch">minecraft-archive.fandom.com/wiki/Redstone_Torch</a></li>
+<li id="src-18">PCWorld, "8-bit computer processor built in Minecraft can run its own games" (CHUNGUS 2). <a href="https://www.pcworld.com/article/559794/8-bit-computer-processor-built-in-minecraft-can-run-its-own-games.html">www.pcworld.com/article/559794/8-bit-computer-processor-built-in-minecraft-can-run-its-own-games.html</a></li>
+<li id="src-19">Factorio Friday Facts #88 (combinators). <a href="https://factorio.com/blog/post/fff-88">factorio.com/blog/post/fff-88</a></li>
+<li id="src-20">shapez 2 wiki, "OR Gate". <a href="https://shapez2.wiki.gg/wiki/OR_Gate">shapez2.wiki.gg/wiki/OR_Gate</a></li>
+<li id="src-21">Wikipedia, "Robot Odyssey". <a href="https://en.wikipedia.org/wiki/Robot_Odyssey">en.wikipedia.org/wiki/Robot_Odyssey</a></li>
+<li id="src-22">Wikipedia, "Circuit diagram" (layout conventions). <a href="https://en.wikipedia.org/wiki/Circuit_diagram">en.wikipedia.org/wiki/Circuit_diagram</a></li>
+<li id="src-23">Wikipedia, "The Image of the City" (Kevin Lynch, 1960). <a href="https://en.wikipedia.org/wiki/The_Image_of_the_City">en.wikipedia.org/wiki/The_Image_of_the_City</a></li>
+<li id="src-24">Oxygen Not Included wiki, "Guide/Automation". <a href="https://oxygennotincluded.wiki.gg/wiki/Guide/Automation">oxygennotincluded.wiki.gg/wiki/Guide/Automation</a></li>
+<li id="src-25">Cities: Skylines wiki, "Info views". <a href="https://skylines.paradoxwikis.com/Info_views">skylines.paradoxwikis.com/Info_views</a></li>
+<li id="src-26">Wikipedia, "Tube map" (Harry Beck's 1931/33 diagram). <a href="https://en.wikipedia.org/wiki/Tube_map">en.wikipedia.org/wiki/Tube_map</a></li>
+<li id="src-27">Fyfe, McNeil, Son &amp; Goldstone (2014), "Concreteness fading in mathematics and science instruction: a systematic review", Educational Psychology Review. <a href="https://doi.org/10.1007/s10648-014-9249-3">doi.org/10.1007/s10648-014-9249-3</a></li>
+<li id="src-28">Ainsworth (2006), "DeFT: A conceptual framework for considering learning with multiple representations". <a href="https://nottingham-repository.worktribe.com/output/23577631/deft-a-conceptual-framework-for-considering-learning-with-multiple-representations">nottingham-repository.worktribe.com/output/23577631/deft-a-conceptual-framework-for-considering-learning-with-multiple-representations</a></li>
+<li id="src-29">Wikipedia, "Rent's rule". <a href="https://en.wikipedia.org/wiki/Rent%27s_rule">en.wikipedia.org/wiki/Rent%27s_rule</a></li>
+<li id="src-30">Lanzerotti, Fiorenza &amp; Rand (2005), on E. F. Rent's work and Rent exponents by chip type, IBM Journal of R&amp;D. <a href="https://ibm1401.computerhistory.org/Pics2/RentsRule1401-Lanzerotti-IBM2005.pdf">ibm1401.computerhistory.org/Pics2/RentsRule1401-Lanzerotti-IBM2005.pdf</a></li>
+<li id="src-31">Tversky (1992), "Distortions in cognitive maps", Geoforum. <a href="https://www.tc.columbia.edu/faculty/bt2158/faculty-profile/files/1992_Tversky_Distortionsincognitivemaps.pdf">www.tc.columbia.edu/faculty/bt2158/faculty-profile/files/1992_Tversky_Distortionsincognitivemaps.pdf</a></li>
+<li id="src-32">Wikipedia, "NAND logic" (gate counts). <a href="https://en.wikipedia.org/wiki/NAND_logic">en.wikipedia.org/wiki/NAND_logic</a></li>
+<li id="src-33">Wikipedia, "Flip-flop (electronics)". <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)">en.wikipedia.org/wiki/Flip-flop_(electronics)</a></li>
+<li id="src-34">Gentner &amp; Gentner (1983), "Flowing Waters or Teeming Crowds: Mental Models of Electricity". <a href="https://groups.psych.northwestern.edu/gentner/papers/GentnerGentner83.pdf">groups.psych.northwestern.edu/gentner/papers/GentnerGentner83.pdf</a></li>
+<li id="src-35">Wikipedia, "Byzantine beacon system". <a href="https://en.wikipedia.org/wiki/Byzantine_beacon_system">en.wikipedia.org/wiki/Byzantine_beacon_system</a></li>
+<li id="src-36">Wikipedia, "Semaphore line" (Chappe telegraph). <a href="https://en.wikipedia.org/wiki/Semaphore_line">en.wikipedia.org/wiki/Semaphore_line</a></li>
+<li id="src-37">Wikipedia, "Exchequer". <a href="https://en.wikipedia.org/wiki/Exchequer">en.wikipedia.org/wiki/Exchequer</a></li>
+<li id="src-38">Hackaday (2024), "Fictional Computers: The Three-Body Problem". <a href="https://hackaday.com/2024/04/05/fictional-computers-the-three-body-problem/">hackaday.com/2024/04/05/fictional-computers-the-three-body-problem</a></li>
+<li id="src-39">Wikipedia, "Rocky's Boots". <a href="https://en.wikipedia.org/wiki/Rocky%27s_Boots">en.wikipedia.org/wiki/Rocky%27s_Boots</a></li>
+<li id="src-40">Wikipedia, "Pipe marking" (ASME A13.1 colours). <a href="https://en.wikipedia.org/wiki/Pipe_marking">en.wikipedia.org/wiki/Pipe_marking</a></li>
+<li id="src-41">Wikipedia, "Z1 (computer)". <a href="https://en.wikipedia.org/wiki/Z1_(computer)">en.wikipedia.org/wiki/Z1_(computer)</a></li>
+<li id="src-42">Wikipedia, "Interlocking" (railway signalling). <a href="https://en.wikipedia.org/wiki/Interlocking">en.wikipedia.org/wiki/Interlocking</a></li>
+<li id="src-43">Wikipedia, "Programmable logic controller". <a href="https://en.wikipedia.org/wiki/Programmable_logic_controller">en.wikipedia.org/wiki/Programmable_logic_controller</a></li>
+<li id="src-44">Wikipedia, "Turing Tumble". <a href="https://en.wikipedia.org/wiki/Turing_Tumble">en.wikipedia.org/wiki/Turing_Tumble</a></li>
+<li id="src-45">Factorio wiki, "Tutorial:Main bus". <a href="https://wiki.factorio.com/Tutorial:Main_bus">wiki.factorio.com/Tutorial:Main_bus</a></li>
+<li id="src-46">Nielsen et al. (2016), "Genetic circuit design automation" (Cello), Science. <a href="https://pubmed.ncbi.nlm.nih.gov/27034378/">pubmed.ncbi.nlm.nih.gov/27034378</a></li>
+<li id="src-47">Tamsir, Tabor &amp; Voigt (2011), "Robust multicellular computing using genetically encoded NOR gates and chemical 'wires'", Nature. <a href="https://pubmed.ncbi.nlm.nih.gov/21150903/">pubmed.ncbi.nlm.nih.gov/21150903</a></li>
+<li id="src-48">Tero et al. (2010), "Rules for biologically inspired adaptive network design", Science. <a href="https://doi.org/10.1126/science.1177894">doi.org/10.1126/science.1177894</a></li>
+<li id="src-49">Adamatzky (2010), "Slime mould logical gates" (arXiv:1005.2301). <a href="https://arxiv.org/abs/1005.2301">arxiv.org/abs/1005.2301</a></li>
+<li id="src-50">Roberts &amp; Adamatzky (2022), "Mining logical circuits in fungi", Scientific Reports. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9508188/">pmc.ncbi.nlm.nih.gov/articles/PMC9508188</a></li>
+<li id="src-51">ScienceDaily (2011), on Seeley et al., honeybee stop signals and cross-inhibition. <a href="https://www.sciencedaily.com/releases/2011/12/111208141942.htm">www.sciencedaily.com/releases/2011/12/111208141942.htm</a></li>
+<li id="src-52">Böhm et al. (2016), "The Venus flytrap Dionaea muscipula counts prey-induced action potentials…", Current Biology. <a href="https://doi.org/10.1016/j.cub.2015.11.057">doi.org/10.1016/j.cub.2015.11.057</a></li>
+<li id="src-53">Tislar &amp; Steelman (2021), Brain and Behavior: reports Rey (2012) and Sundararajan &amp; Adesope (2020) seductive-details figures. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8442593/">pmc.ncbi.nlm.nih.gov/articles/PMC8442593</a></li>
+<li id="src-54">Twomey &amp; Kroneisen (2021), meta-analysis of the method of loci, Quarterly Journal of Experimental Psychology. <a href="https://journals.sagepub.com/doi/10.1177/1747021821993457">journals.sagepub.com/doi/10.1177/1747021821993457</a></li>
+<li id="src-55">Trninic (2020), on the concrete-vs-abstract examples debate following Kaminski et al. (2008). <a href="https://edrl.berkeley.edu/wp-content/uploads/2020/08/Trninic-2020-CogSci.pdf">edrl.berkeley.edu/wp-content/uploads/2020/08/Trninic-2020-CogSci.pdf</a></li>
+<li id="src-56">Example of the thin evidence on game-based logic learning: Lancaster University (2024) study. <a href="https://eprints.lancs.ac.uk/id/eprint/227709">eprints.lancs.ac.uk/id/eprint/227709</a></li>
+<li id="src-57">Habgood &amp; Ainsworth (2011), "Motivating Children to Learn Effectively: Exploring the Value of Intrinsic Integration in Educational Games", Journal of the Learning Sciences 20(2). <a href="https://doi.org/10.1080/10508406.2010.508029">doi.org/10.1080/10508406.2010.508029</a></li></ol>
+  <h3>Image credits</h3>
+  <p class="prose">Wikimedia Commons photos are hosted alongside this page under their own licences. Game screenshots are loaded from the publishers' store pages and remain theirs.</p>
+  <ul class="credits"><li><a href="img/die-6502.jpg">die-6502.jpg</a>: Pauli Rautakorpi · <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:MOS_6502_die.jpg">Wikimedia Commons</a></li>
+<li><a href="img/die-6502-breaknes.jpg">die-6502-breaknes.jpg</a>: BreakNES.com · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:BreakNES_MOS_6502.jpg">Wikimedia Commons</a></li>
+<li><a href="img/intel-4004-layout.jpg">intel-4004-layout.jpg</a>: Wolfgang Stief (photo), Pittigrilli (edit) · <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a> · <a href="https://commons.wikimedia.org/wiki/File:Chip_layout_from_the_development_phase_of_the_Intel_4004_from_1971,_the_first_microprocessor_of_the_world_(cropped_and_edited_image).jpg">Wikimedia Commons</a></li>
+<li><a href="img/megaprocessor.jpg">megaprocessor.jpg</a>: Steve Elliott from UK · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Megaprocessor_(51331601517).jpg">Wikimedia Commons</a></li>
+<li>CodeCity screenshot: © Richard Wettel · <a href="https://wettel.github.io/codecity.html">CodeCity page</a> (hotlinked)</li>
+<li>Turing Complete screenshot: © LevelHead · <a href="https://store.steampowered.com/app/1444480/">Turing Complete page</a> (hotlinked)</li>
+<li>Logic World screenshot: © Mouse Hat Games · <a href="https://store.steampowered.com/app/1054340/">Logic World page</a> (hotlinked)</li>
+<li><a href="img/digi-comp-ii.jpg">digi-comp-ii.jpg</a>: Bobroswell · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Digi-Comp_II.jpg">Wikimedia Commons</a></li>
+<li><a href="img/fluidic-and-xor.png">fluidic-and-xor.png</a>: Joseph Fyfield, Xing Liu · Public domain · <a href="https://commons.wikimedia.org/wiki/File:Fluidic_AND_XOR.svg">Wikimedia Commons</a></li>
+<li>Voxel Tycoon screenshot: © Voxel Tycoon · <a href="https://store.steampowered.com/app/732050/">Voxel Tycoon page</a> (hotlinked)</li>
+<li>Teardown screenshot: © Tuxedo Labs · <a href="https://store.steampowered.com/app/1167630/">Teardown page</a> (hotlinked)</li>
+<li>Block'hood screenshot: © Plethora Project · <a href="https://store.steampowered.com/app/416210/">Block'hood page</a> (hotlinked)</li>
+<li>MagicaVoxel screenshot: © ephtracy · <a href="https://ephtracy.github.io/">MagicaVoxel page</a> (hotlinked)</li>
+<li>Townscaper screenshot: © Oskar Stålberg · <a href="https://store.steampowered.com/app/1291340/">Townscaper page</a> (hotlinked)</li>
+<li>Mini Metro screenshot: © Dinosaur Polo Club · <a href="https://store.steampowered.com/app/287980/">Mini Metro page</a> (hotlinked)</li>
+<li><a href="img/veloren-village.png">veloren-village.png</a>: Veloren team and community; screenshot by PantheraLeo1359531 · <a href="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</a> · <a href="https://commons.wikimedia.org/wiki/File:Veloren_Screenshot_2023.02.09_-_16.12.11.63.png">Wikimedia Commons</a></li>
+<li>Stonehearth screenshot: © Radiant Entertainment · <a href="https://store.steampowered.com/app/253250/">Stonehearth page</a> (hotlinked)</li>
+<li>Castle Story screenshot: © Sauropod Studio · <a href="https://store.steampowered.com/app/227860/">Castle Story page</a> (hotlinked)</li>
+<li>Tiny Glade screenshot: © Pounce Light · <a href="https://store.steampowered.com/app/2198150/">Tiny Glade page</a> (hotlinked)</li>
+<li><a href="img/castle-rushen-portcullis.jpg">castle-rushen-portcullis.jpg</a>: Manxruler · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Castle_Rushen_gatehouse_entrance_and_portcullis.jpg">Wikimedia Commons</a></li>
+<li><a href="img/market-cross.jpg">market-cross.jpg</a>: Chris McAuley · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Market_Cross_(geograph_2293472).jpg">Wikimedia Commons</a></li>
+<li><a href="img/chappe-tower.jpg">chappe-tower.jpg</a>: Erixsen · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Tour_Chappe_-_Saint_Marcan_-_Ille-et-Vilaine_-_France.jpg">Wikimedia Commons</a></li>
+<li><a href="img/lavenham-guildhall.jpg">lavenham-guildhall.jpg</a>: Jonathan Thacker · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Lavenham_Guildhall_-_geograph.org.uk_-_4918699.jpg">Wikimedia Commons</a></li>
+<li><a href="img/hereford-chained-library.jpg">hereford-chained-library.jpg</a>: Stuart Wilding · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:The_Chained_Library,_Hereford_Cathedral_-_geograph.org.uk_-_8173040.jpg">Wikimedia Commons</a></li>
+<li><a href="img/monpazier-aerial.jpg">monpazier-aerial.jpg</a>: Mairiemonpazier · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Vue_a%C3%A9rienne_de_Monpazier.jpg">Wikimedia Commons</a></li>
+<li><a href="img/nordlingen-aerial.jpg">nordlingen-aerial.jpg</a>: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:N%C3%B6rdlingen_Altstadt_Aerial.jpg">Wikimedia Commons</a></li>
+<li><a href="img/bruges-belfry.jpg">bruges-belfry.jpg</a>: Adiel lo · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Brugge_Belfort_HDR.jpg">Wikimedia Commons</a></li>
+<li><a href="img/wells-clock.jpg">wells-clock.jpg</a>: DeFacto · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Wells_clock.jpg">Wikimedia Commons</a></li>
+<li>FOUNDRY screenshot: © Channel 3 Entertainment / Paradox · <a href="https://store.steampowered.com/app/983870/">FOUNDRY page</a> (hotlinked)</li>
+<li>Infinifactory screenshot: © Zachtronics · <a href="https://store.steampowered.com/app/300570/">Infinifactory page</a> (hotlinked)</li>
+<li><a href="img/zuse-z1.jpg">zuse-z1.jpg</a>: Alex J. Lowry from Scotland · <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a> · <a href="https://commons.wikimedia.org/wiki/File:Zuse_Z1_Replica,_Berlin_-_Flickr_-_AlexJLowry.jpg">Wikimedia Commons</a></li>
+<li><a href="img/post-sorting.jpg">post-sorting.jpg</a>: Milestoned from Deutschland(Germany) · <a href="https://creativecommons.org/licenses/by/2.0">CC BY 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Post_Sorting_Machine_(4479045801).jpg">Wikimedia Commons</a></li>
+<li><a href="img/ford-line-1913.jpg">ford-line-1913.jpg</a>: Unknown author · Public domain · <a href="https://commons.wikimedia.org/wiki/File:Ford_assembly_line_-_1913.jpg">Wikimedia Commons</a></li>
+<li><a href="img/jacquard-loom.jpg">jacquard-loom.jpg</a>: Stephencdickson · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:A_Jacquard_loom_showing_information_punchcards,_National_Museum_of_Scotland.jpg">Wikimedia Commons</a></li>
+<li><a href="img/turing-tumble.jpg">turing-tumble.jpg</a>: Pgboswell · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Turing_Tumble_game_board.jpg">Wikimedia Commons</a></li>
+<li><a href="img/high-bay-warehouse.jpg">high-bay-warehouse.jpg</a>: Gilgen Logistics AG · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Automatisches_Hochregallager_mit_Regalbedienger%C3%A4ten.jpg">Wikimedia Commons</a></li>
+<li><a href="img/strowger-exchange.jpg">strowger-exchange.jpg</a>: Darklanlan · <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:NTT_strowger_telephone_exchange.jpg">Wikimedia Commons</a></li>
+<li>Cloud Gardens screenshot: © Noio · <a href="https://store.steampowered.com/app/1372320/">Cloud Gardens page</a> (hotlinked)</li>
+<li><a href="img/physarum-network.jpg">physarum-network.jpg</a>: Tim Tim (VD fr) · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Physarum_polycephalum_network.jpg">Wikimedia Commons</a></li>
+<li><a href="img/physarum.jpg">physarum.jpg</a>: HelenGinger · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Physarum_polycephalum.jpg">Wikimedia Commons</a></li>
+<li><a href="img/hyphae.jpg">hyphae.jpg</a>: TheAlphaWolf · <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Hyphae.JPG">Wikimedia Commons</a></li>
+<li><a href="img/root-bridge.jpg">root-bridge.jpg</a>: PJeganathan · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Living_root_bridges_of_Nongriat_village_in_East_Khasi_Hills_district,_Meghalaya_JEG7387.jpg">Wikimedia Commons</a></li>
+<li><a href="img/panellus.jpg">panellus.jpg</a>: Ylem · Public domain · <a href="https://commons.wikimedia.org/wiki/File:PanellusStipticusAug12_2009.jpg">Wikimedia Commons</a></li>
+<li><a href="img/coral-outcrop.jpg">coral-outcrop.jpg</a>: Toby Hudson · <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Coral_Outcrop_Flynn_Reef.jpg">Wikimedia Commons</a></li>
+<li><a href="img/termite-mound.jpg">termite-mound.jpg</a>: J Brew · <a href="https://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Cathedral_Termite_Mound_-_brewbooks.jpg">Wikimedia Commons</a></li>
+<li><a href="img/lotus-pod.jpg">lotus-pod.jpg</a>: Krishna satya 333 · <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a> · <a href="https://commons.wikimedia.org/wiki/File:Seed_pod_of_lotus_flower.jpg">Wikimedia Commons</a></li>
+<li><a href="img/honeycomb.jpg">honeycomb.jpg</a>: Waugsberg · <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> · <a href="https://commons.wikimedia.org/wiki/File:Bienenwabe_mit_Eiern_und_Brut_5.jpg">Wikimedia Commons</a></li>
+<li><a href="img/phillips-machine.jpg">phillips-machine.jpg</a>: LSE Library · <a href="https://www.flickr.com/commons/usage/">No restrictions</a> · <a href="https://commons.wikimedia.org/wiki/File:Restored_Phillips_Machine,_1993_(3990093924).jpg">Wikimedia Commons</a></li>
+<li><a href="img/signal-frame-1928.jpg">signal-frame-1928.jpg</a>: Andy Dingley (scanner) · Public domain · <a href="https://commons.wikimedia.org/wiki/File:Electric_signal_frame,_Blackfriars_Junction,_Southern_Railway_(CJ_Allen,_Steel_Highway,_1928).jpg">Wikimedia Commons</a></li>
+<li><a href="img/harwell-dekatron.jpg">harwell-dekatron.jpg</a>: BadgersCP · <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a> · <a href="https://commons.wikimedia.org/wiki/File:Harwell_Dekatron_TNMOC-CP.jpg">Wikimedia Commons</a></li></ul>
+</section>
+
+</main>
+
+<footer>
+  Researched and written with Claude in two passes, November 2026. A mood board for an unbuilt game, not a finished design.
+</footer>
+</div>
+
+<script>
+(() => {
+  const list = document.querySelector('[role="tablist"]');
+  if (!list) return;
+  const tabs = [...list.querySelectorAll('[role="tab"]')];
+  const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')));
+  list.hidden = false;
+  const select = (i, focus) => {
+    tabs.forEach((t, j) => {
+      const on = i === j;
+      t.setAttribute('aria-selected', on);
+      t.tabIndex = on ? 0 : -1;
+      panels[j].hidden = !on;
+    });
+    if (focus) tabs[i].focus();
+    try { localStorage.setItem('vlc-theme', i); } catch (e) {}
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(i));
+    t.addEventListener('keydown', (e) => {
+      const k = e.key;
+      if (k === 'ArrowRight' || k === 'ArrowLeft' || k === 'Home' || k === 'End') {
+        e.preventDefault();
+        const n = k === 'Home' ? 0 : k === 'End' ? tabs.length - 1 : (i + (k === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+        select(n, true);
+      }
+    });
+  });
+  let start = 0;
+  try { start = +localStorage.getItem('vlc-theme') || 0; } catch (e) {}
+  select(start >= 0 && start < tabs.length ? start : 0);
+})();
+</script>
+</body>
+</html>
