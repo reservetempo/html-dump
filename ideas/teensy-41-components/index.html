@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teensy 4.1, part by part</title>
+<meta name="description" content="An explainer of each component on a Teensy 4.1, with the parts marked in red that a rotary-encoder-to-USB board does not need.">
+<style>
+  :root {
+    --paper: #f3efe6;
+    --card: #fbf9f4;
+    --ink: #1d1c1a;
+    --mute: #6a655b;
+    --line: #cdc6b6;
+    --board: #e7e1d1;
+    --red: #d3231b;
+    --red-soft: #fbe6e3;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  main { max-width: 1020px; margin: 0 auto; padding: 0 20px 80px; }
+  header { padding: 56px 0 28px; border-bottom: 3px solid var(--ink); }
+  .doc-id { font: 600 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+  h1 { font-size: clamp(34px, 6vw, 58px); line-height: 1.05; margin: 14px 0 18px; letter-spacing: -.02em; }
+  h2 { font-size: 26px; line-height: 1.2; margin: 64px 0 6px; letter-spacing: -.01em; }
+  h2 .n { font: 600 13px/1 var(--mono); color: var(--mute); display: block; margin-bottom: 10px; letter-spacing: .12em; }
+  h3 { font-size: 18px; margin: 34px 0 8px; }
+  p { margin: 0 0 14px; max-width: 68ch; }
+  .lede { font-size: 20px; line-height: 1.5; max-width: 60ch; }
+  a { color: inherit; }
+  .red { color: var(--red); font-weight: 650; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 26px; margin: 22px 0 0; font: 600 14px/1.3 var(--mono); }
+  .legend span { display: inline-flex; align-items: center; gap: 9px; }
+  .sw { width: 18px; height: 18px; border: 2px solid var(--ink); background: #fff; display: inline-block; }
+  .sw.x { background: var(--red); border-color: #8f140e; }
+
+  figure { margin: 22px 0 8px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 16px; }
+  figcaption { font-size: 14px; color: var(--mute); margin-top: 10px; max-width: 80ch; }
+  .wide { overflow-x: auto; }
+  .wide svg { min-width: 720px; }
+  svg { display: block; width: 100%; height: auto; }
+
+  /* drawing vocabulary */
+  svg text { font-family: var(--mono); fill: var(--ink); }
+  .brd { fill: var(--board); stroke: var(--ink); stroke-width: 2.5; }
+  .c { fill: #fff; stroke: var(--ink); stroke-width: 2; }
+  .c.x { fill: var(--red); stroke: #8f140e; }
+  .t { font-size: 11px; font-weight: 600; text-anchor: middle; }
+  .t.x, text.x { fill: #fff; }
+  .lbl { font-size: 12px; font-weight: 600; }
+  .lbl.r { fill: var(--red); }
+  .sm { font-size: 9px; text-anchor: middle; fill: var(--mute); }
+  .sm.x { fill: var(--red); }
+  .pin { fill: #fff; stroke: var(--ink); stroke-width: 1.8; }
+  .pin.x { fill: var(--red); stroke: #8f140e; }
+  .w { fill: none; stroke: var(--ink); stroke-width: 2; }
+  .w.x { stroke: var(--red); }
+  .dash { stroke-dasharray: 5 5; }
+  .m circle { fill: var(--ink); stroke: #fff; stroke-width: 2; }
+  .m.x circle { fill: var(--red); }
+  .m text { fill: #fff; font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+  svg .x { transition: opacity .25s; }
+  body.strip #map .x, body.strip #map-b .x { opacity: .07; }
+
+  .toggle { display: inline-flex; align-items: center; gap: 10px; font: 600 14px/1.2 var(--mono); margin: 18px 0 0; cursor: pointer; user-select: none; }
+  .toggle input { width: 18px; height: 18px; accent-color: var(--red); }
+
+  .cards { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 18px; }
+  @media (min-width: 780px) { .cards { grid-template-columns: 1fr 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--ink); border-radius: 6px; padding: 16px 18px 6px; }
+  .card.x { border-left-color: var(--red); background: var(--red-soft); border-color: #eab8b3; border-left-color: var(--red); }
+  .card h3 { margin: 0 0 2px; display: flex; gap: 10px; align-items: baseline; font-size: 18px; }
+  .card.x h3 { color: var(--red); }
+  .num { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; font: 700 13px/26px var(--mono); text-align: center; transform: translateY(-1px); }
+  .card.x .num { background: var(--red); }
+  .part { font: 500 13px/1.4 var(--mono); color: var(--mute); margin: 0 0 10px 36px; }
+  .card p { font-size: 16px; }
+  .tag { font: 700 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; padding: 5px 7px; border: 1.5px solid currentColor; border-radius: 3px; display: inline-block; margin-bottom: 12px; }
+  .card.x .tag { color: var(--red); }
+
+  .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin: 18px 0 6px; }
+  .chip { border: 2px solid var(--ink); background: #fff; border-radius: 4px; padding: 9px 11px; font: 600 13px/1.35 var(--mono); }
+  .chip small { display: block; font-weight: 500; color: var(--mute); font-size: 11.5px; margin-top: 2px; }
+  .chip.x { background: var(--red); border-color: #8f140e; color: #fff; }
+  .chip.x small { color: #ffd9d5; }
+  .chip.star { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  ul.plain { padding-left: 20px; margin: 8px 0 14px; max-width: 68ch; }
+  ul.plain li { margin-bottom: 6px; }
+  .note { border-left: 4px solid var(--ink); padding: 4px 0 4px 16px; margin: 20px 0; color: #33312d; }
+  footer { margin-top: 70px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 14px; color: var(--mute); }
+  footer p { max-width: 80ch; }
+</style>
+</head>
+<body>
+
+<!-- shared arrow heads -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1d1c1a"/></marker>
+    <marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#d3231b"/></marker>
+  </defs>
+</svg>
+
+<main>
+<header>
+  <div class="doc-id">Component explainer · Teensy 4.1 · Rotary encoder project</div>
+  <h1>Teensy 4.1, part by part</h1>
+  <p class="lede">The Teensy 4.1 is a small development board. It has a very fast processor and many connections. Your project uses only a small part of it.</p>
+  <p>Your project: rotary encoders send their position to a computer. A digital synthesizer on the computer uses the position values.</p>
+  <p>This page shows each component on the board and tells you what it does. <span class="red">Red components are not necessary for your project.</span> If you make a new board for this project only, you can remove them.</p>
+  <div class="legend">
+    <span><i class="sw"></i> Necessary for the project</span>
+    <span><i class="sw x"></i> Not necessary. Remove on a new board.</span>
+  </div>
+</header>
+
+<!-- ───────────── 1. THE TASK ───────────── -->
+<h2><span class="n">SECTION 1</span>The task of the board</h2>
+<p>The board has one task. It reads the encoders and tells the computer how far each one turned. The diagram shows the path of the signal.</p>
+
+<figure>
+  <div class="wide">
+  <svg viewBox="0 0 980 160" role="img" aria-label="Signal path from the encoder through the board to the synthesizer software">
+    <rect class="c" x="10" y="40" width="120" height="70" rx="4"/>
+    <circle class="c" cx="40" cy="75" r="16"/><line class="w" x1="40" y1="75" x2="40" y2="62"/>
+    <text class="t" x="88" y="72">Rotary</text><text class="t" x="88" y="87">encoder</text>
+    <line class="w" x1="130" y1="75" x2="172" y2="75" marker-end="url(#ah)"/>
+    <text class="sm" x="151" y="62">A, B</text>
+
+    <rect class="c" x="175" y="40" width="110" height="70" rx="4"/>
+    <text class="t" x="230" y="72">2 input</text><text class="t" x="230" y="87">pins</text>
+    <line class="w" x1="285" y1="75" x2="327" y2="75" marker-end="url(#ah)"/>
+
+    <rect class="c" x="330" y="40" width="150" height="70" rx="4"/>
+    <text class="t" x="405" y="72">Decoder:</text><text class="t" x="405" y="87">counts the changes</text>
+    <line class="w" x1="480" y1="75" x2="522" y2="75" marker-end="url(#ah)"/>
+    <text class="sm" x="501" y="62">count</text>
+
+    <rect class="c" x="525" y="40" width="150" height="70" rx="4"/>
+    <text class="t" x="600" y="72">Program:</text><text class="t" x="600" y="87">makes a message</text>
+    <line class="w" x1="675" y1="75" x2="717" y2="75" marker-end="url(#ah)"/>
+
+    <rect class="c" x="720" y="40" width="80" height="70" rx="4"/>
+    <text class="t" x="760" y="79">USB</text>
+    <line class="w" x1="800" y1="75" x2="842" y2="75" marker-end="url(#ah)"/>
+    <text class="sm" x="821" y="62">cable</text>
+
+    <rect class="c" x="845" y="40" width="125" height="70" rx="4"/>
+    <text class="t" x="907" y="72">Computer:</text><text class="t" x="907" y="87">synthesizer</text>
+
+    <path class="w dash" d="M175 128H800"/>
+    <text class="sm" x="487" y="148">ON THE BOARD</text>
+  </svg>
+  </div>
+  <figcaption>The computer can see the board as a MIDI device, a serial port or a game controller. You select this in the Teensy software.</figcaption>
+</figure>
+
+<h3>How an encoder shows its position</h3>
+<p>A rotary encoder has two outputs, A and B. When you turn the shaft, each output changes between on (1) and off (0). The two outputs do not change at the same time. There is a quarter of a cycle between them.</p>
+<p>The sequence of the changes shows the direction. The number of changes shows the distance. This method is known as quadrature.</p>
+
+<figure>
+  <svg viewBox="0 0 600 240" role="img" aria-label="Quadrature signals A and B, one quarter cycle apart">
+    <text class="lbl" x="18" y="65">A</text>
+    <text class="lbl" x="18" y="145">B</text>
+    <path class="w" stroke-width="3" d="M60 80H100V40H180V80H260V40H340V80H420V40H500V80H540"/>
+    <path class="w" stroke-width="3" d="M60 160H140V120H220V160H300V120H380V160H460V120H540"/>
+    <g stroke="#cdc6b6" stroke-width="1.5" stroke-dasharray="3 4">
+      <path d="M100 28V176M140 28V176M180 28V176M220 28V176M260 28V176M300 28V176M340 28V176M380 28V176M420 28V176M460 28V176M500 28V176"/>
+    </g>
+    <g class="sm" style="font-size:11px">
+      <text x="120" y="192">10</text><text x="160" y="192">11</text><text x="200" y="192">01</text><text x="240" y="192">00</text>
+      <text x="280" y="192">10</text><text x="320" y="192">11</text><text x="360" y="192">01</text><text x="400" y="192">00</text>
+      <text x="440" y="192">10</text><text x="480" y="192">11</text>
+    </g>
+    <line class="w" x1="110" y1="214" x2="290" y2="214" marker-end="url(#ah)"/>
+    <text class="sm" x="200" y="232" style="font-size:11px">one direction: count + 1</text>
+    <line class="w" x1="490" y1="214" x2="310" y2="214" marker-end="url(#ah)"/>
+    <text class="sm" x="400" y="232" style="font-size:11px">other direction: count − 1</text>
+  </svg>
+  <figcaption>The numbers show the values of A and B together. Each change of the pair is one count. The order 10 → 11 → 01 → 00 is one direction. The opposite order is the other direction.</figcaption>
+</figure>
+
+<p>An encoder that you turn by hand makes, at most, some thousands of changes each second. The processor on the Teensy 4.1 does 600 million cycles each second. Thus the task uses a very small part of the processor.</p>
+
+<!-- ───────────── 2. BOARD MAP ───────────── -->
+<h2><span class="n">SECTION 2</span>Map of the board</h2>
+<p>The numbers on the map agree with the numbers in Sections 3 and 4.</p>
+<label class="toggle"><input type="checkbox" id="strip"> Remove the red parts from the map</label>
+
+<figure>
+  <div class="wide">
+  <svg id="map" viewBox="0 0 980 345" role="img" aria-label="Simplified top view of the Teensy 4.1 with numbered components">
+    <rect class="brd" x="40" y="50" width="900" height="250" rx="8"/>
+    <g id="pins"></g>
+
+    <!-- 5 USB connector -->
+    <rect class="c" x="16" y="138" width="84" height="74" rx="4"/>
+    <text class="t" x="58" y="172">Micro</text><text class="t" x="58" y="186">USB</text>
+    <!-- 6 regulator -->
+    <rect class="c" x="116" y="198" width="44" height="32" rx="2"/>
+    <text class="t" x="138" y="218">3.3V</text>
+    <!-- 10 ethernet header + PHY -->
+    <g class="x">
+      <circle class="pin x" cx="128" cy="120" r="7"/><circle class="pin x" cx="150" cy="120" r="7"/><circle class="pin x" cx="172" cy="120" r="7"/>
+      <circle class="pin x" cx="128" cy="142" r="7"/><circle class="pin x" cx="150" cy="142" r="7"/><circle class="pin x" cx="172" cy="142" r="7"/>
+      <rect class="c x" x="204" y="110" width="46" height="46" rx="2"/>
+      <text class="t x" x="227" y="137">PHY</text>
+    </g>
+    <!-- 11 USB host pins + switch -->
+    <g class="x">
+      <circle class="pin x" cx="188" cy="222" r="7"/><circle class="pin x" cx="210" cy="222" r="7"/><circle class="pin x" cx="232" cy="222" r="7"/><circle class="pin x" cx="254" cy="222" r="7"/><circle class="pin x" cx="276" cy="222" r="7"/>
+      <rect class="c x" x="262" y="172" width="38" height="24" rx="2"/>
+    </g>
+    <!-- 4 crystal 24 MHz -->
+    <rect class="c" x="328" y="116" width="56" height="30" rx="8"/>
+    <text class="t" x="356" y="135">24 MHz</text>
+    <!-- 2 flash -->
+    <rect class="c" x="328" y="184" width="58" height="46" rx="2"/>
+    <text class="t" x="357" y="211">Flash</text>
+    <!-- 1 processor -->
+    <rect class="c" x="420" y="108" width="138" height="138" rx="3"/>
+    <text class="t" x="489" y="172" style="font-size:13px">i.MX RT1062</text>
+    <text class="t" x="489" y="190">processor</text>
+    <!-- 14 LED -->
+    <rect class="c x" x="580" y="110" width="26" height="14" rx="2"/>
+    <!-- 3 bootloader chip -->
+    <rect class="c" x="600" y="146" width="50" height="50" rx="2"/>
+    <text class="t" x="625" y="175">Boot</text>
+    <!-- 13 RTC crystal + VBAT / On-Off pins -->
+    <g class="x">
+      <rect class="c x" x="598" y="214" width="44" height="18" rx="6"/>
+      <circle class="pin x" cx="672" cy="223" r="7"/><circle class="pin x" cx="696" cy="223" r="7"/><circle class="pin x" cx="720" cy="223" r="7"/>
+    </g>
+    <!-- 7 program button -->
+    <rect class="c" x="690" y="118" width="48" height="48" rx="3"/>
+    <circle class="c" cx="714" cy="142" r="13"/>
+    <!-- 12 SD socket -->
+    <rect class="c x" x="790" y="110" width="138" height="134" rx="3"/>
+    <text class="t x" x="859" y="174" style="font-size:13px">microSD</text>
+    <text class="t x" x="859" y="192">socket</text>
+
+    <!-- pin brackets -->
+    <path class="w" d="M50 312V320H386V312"/>
+    <path class="w x" d="M394 312V320H930V312"/>
+    <path class="w x" d="M50 38V30H930V38"/>
+
+    <!-- markers -->
+    <g class="m" transform="translate(420,108)"><circle r="12"/><text>1</text></g>
+    <g class="m" transform="translate(328,184)"><circle r="12"/><text>2</text></g>
+    <g class="m" transform="translate(600,146)"><circle r="12"/><text>3</text></g>
+    <g class="m" transform="translate(328,116)"><circle r="12"/><text>4</text></g>
+    <g class="m" transform="translate(16,138)"><circle r="12"/><text>5</text></g>
+    <g class="m" transform="translate(116,198)"><circle r="12"/><text>6</text></g>
+    <g class="m" transform="translate(690,118)"><circle r="12"/><text>7</text></g>
+    <g class="m" transform="translate(218,320)"><circle r="12"/><text>8</text></g>
+    <g class="m x" transform="translate(662,320)"><circle r="12"/><text>9</text></g>
+    <g class="m x" transform="translate(490,30)"><circle r="12"/><text>9</text></g>
+    <g class="m x" transform="translate(204,110)"><circle r="12"/><text>10</text></g>
+    <g class="m x" transform="translate(262,172)"><circle r="12"/><text>11</text></g>
+    <g class="m x" transform="translate(790,110)"><circle r="12"/><text>12</text></g>
+    <g class="m x" transform="translate(646,206)"><circle r="12"/><text>13</text></g>
+    <g class="m x" transform="translate(612,104)"><circle r="12"/><text>14</text></g>
+  </svg>
+  </div>
+  <figcaption>Top side. The USB connector is on the left. The drawing is simplified and the positions are approximate.</figcaption>
+</figure>
+
+<figure>
+  <div class="wide">
+  <svg id="map-b" viewBox="0 0 980 180" role="img" aria-label="Simplified bottom view of the Teensy 4.1 with empty memory positions">
+    <rect class="brd" x="40" y="20" width="900" height="140" rx="8"/>
+    <g class="x">
+      <rect x="352" y="58" width="92" height="64" fill="none" stroke="#d3231b" stroke-width="2" stroke-dasharray="5 4"/>
+      <rect x="516" y="58" width="92" height="64" fill="none" stroke="#d3231b" stroke-width="2" stroke-dasharray="5 4"/>
+      <g fill="#d3231b">
+        <rect x="358" y="42" width="14" height="20"/><rect x="380" y="42" width="14" height="20"/><rect x="402" y="42" width="14" height="20"/><rect x="424" y="42" width="14" height="20"/>
+        <rect x="358" y="118" width="14" height="20"/><rect x="380" y="118" width="14" height="20"/><rect x="402" y="118" width="14" height="20"/><rect x="424" y="118" width="14" height="20"/>
+        <rect x="522" y="42" width="14" height="20"/><rect x="544" y="42" width="14" height="20"/><rect x="566" y="42" width="14" height="20"/><rect x="588" y="42" width="14" height="20"/>
+        <rect x="522" y="118" width="14" height="20"/><rect x="544" y="118" width="14" height="20"/><rect x="566" y="118" width="14" height="20"/><rect x="588" y="118" width="14" height="20"/>
+      </g>
+      <text class="lbl r" x="398" y="95" text-anchor="middle">empty</text>
+      <text class="lbl r" x="562" y="95" text-anchor="middle">empty</text>
+    </g>
+    <g class="m x" transform="translate(480,90)"><circle r="12"/><text>15</text></g>
+  </svg>
+  </div>
+  <figcaption>Bottom side. There are two empty positions for memory chips.</figcaption>
+</figure>
+
+<!-- ───────────── 3. KEEP ───────────── -->
+<h2><span class="n">SECTION 3</span>Components that the project uses</h2>
+<p>These components stay on the board. Together they are the minimum to read encoders and speak USB.</p>
+
+<div class="cards">
+  <div class="card">
+    <h3><span class="num">1</span>Processor</h3>
+    <div class="part">NXP i.MX RT1062 · ARM Cortex-M7 · 600 MHz</div>
+    <span class="tag">Necessary</span>
+    <p>This is the largest chip on the board. It runs your program. It reads the encoder signals, counts them and sends the count through USB.</p>
+    <p>The chip contains 1 MB of RAM. It contains no memory for the program. Thus it needs the flash memory (2).</p>
+    <p>You need a processor, but not this one. Refer to Section 7.</p>
+  </div>
+  <div class="card">
+    <h3><span class="num">2</span>Flash memory</h3>
+    <div class="part">Winbond W25Q64JV · 8 MB</div>
+    <span class="tag">Necessary</span>
+    <p>This chip keeps your program when the power is off. At power-on, the processor reads the program from it.</p>
+    <p>A program for encoders uses less than 1% of the space.</p>
+  </div>
+  <div class="card">
+    <h3><span class="num">3</span>Bootloader chip</h3>
+    <div class="part">NXP MKL02 with PJRC software</div>
+    <span class="tag">Necessary</span>
+    <p>This small chip puts a new program into the flash memory. It starts when the Teensy Loader sends an upload or when you push the Program button. It can also repair the board if your program fails.</p>
+    <p>A new board with the same processor needs this chip to work with the Teensy software. PJRC sells it as a separate part.</p>
+  </div>
+  <div class="card">
+    <h3><span class="num">4</span>24 MHz crystal</h3>
+    <div class="part">Main clock reference</div>
+    <span class="tag">Necessary</span>
+    <p>The crystal gives the processor an accurate time reference. All speeds in the processor come from it. USB communication needs this accuracy.</p>
+  </div>
+  <div class="card">
+    <h3><span class="num">5</span>Micro-USB connector</h3>
+    <div class="part">USB device port · 480 Mbit/s</div>
+    <span class="tag">Necessary</span>
+    <p>This is the connection to your computer. The cable supplies 5 V power to the board. The same cable carries the encoder data to the computer and new programs to the board.</p>
+  </div>
+  <div class="card">
+    <h3><span class="num">6</span>Power parts</h3>
+    <div class="part">3.3 V regulator (TLV75733P) · fuse · inductor · capacitors</div>
+    <span class="tag">Necessary</span>
+    <p>The USB cable supplies 5 V, but the chips use 3.3 V. The regulator decreases the voltage. The fuse protects the computer if there is a short circuit.</p>
+    <p>The inductor is a part of a second converter inside the processor. The capacitors keep each voltage stable. Refer to Section 6.</p>
+  </div>
+  <div class="card">
+    <h3><span class="num">7</span>Program button</h3>
+    <div class="part">Push button</div>
+    <span class="tag">Necessary</span>
+    <p>Push this button to put the board into program mode. Usually the upload starts automatically. The button is the manual alternative, and it is necessary for a repair.</p>
+  </div>
+  <div class="card">
+    <h3><span class="num">8</span>Pins for the encoders</h3>
+    <div class="part">2 signal pins for each encoder · 1 GND pin</div>
+    <span class="tag">Necessary</span>
+    <p>Each encoder uses two signal pins, A and B. The common pin of the encoder connects to GND. A push switch in the encoder uses one more pin.</p>
+    <p>Four encoders need 8 signal pins. The map shows pins 0 to 7 as an example. Some encoder types also need a power pin.</p>
+  </div>
+</div>
+
+<!-- ───────────── 4. REMOVE ───────────── -->
+<h2><span class="n">SECTION 4</span><span class="red">Components that the project does not use</span></h2>
+<p>These components do no work in your project. A board for this project only does not need them.</p>
+
+<div class="cards">
+  <div class="card x">
+    <h3><span class="num">9</span>All other pins</h3>
+    <div class="part">Approximately 45 of 55 input/output pins · VIN pin</div>
+    <span class="tag">Not necessary</span>
+    <p>The board has 55 input/output pins. 42 of them are on the two long sides. The other 13 go to the SD socket and to the memory positions on the bottom.</p>
+    <p>These pins supply analog inputs, serial ports, audio, CAN bus and more. Your project uses approximately 8 of them. The VIN pin is for external power, and USB already supplies the power.</p>
+  </div>
+  <div class="card x">
+    <h3><span class="num">10</span>Ethernet chip and pins</h3>
+    <div class="part">TI DP83825I PHY · 6-pin header</div>
+    <span class="tag">Not necessary</span>
+    <p>This chip changes network data from the processor into the electrical signals for a network cable. It does work only if you add an Ethernet jack to the 6 pins.</p>
+    <p>Your data goes through USB. A network connection is not necessary.</p>
+  </div>
+  <div class="card x">
+    <h3><span class="num">11</span>USB host port</h3>
+    <div class="part">5 pins · TPD3S014 power switch</div>
+    <span class="tag">Not necessary</span>
+    <p>This second USB port lets you connect USB devices to the Teensy, for example a keyboard. The switch chip controls the 5 V power to that device and limits the current.</p>
+    <p>Your board is a USB device only. It is not a host.</p>
+  </div>
+  <div class="card x">
+    <h3><span class="num">12</span>microSD socket</h3>
+    <div class="part">Card socket on a fast 4-bit interface</div>
+    <span class="tag">Not necessary</span>
+    <p>The socket holds a memory card for files, for example audio recordings or data logs. Your project stores no files.</p>
+  </div>
+  <div class="card x">
+    <h3><span class="num">13</span>Clock crystal, VBAT pin and On/Off pin</h3>
+    <div class="part">32.768 kHz crystal · coin cell input · power button input</div>
+    <span class="tag">Not necessary</span>
+    <p>The small crystal operates a clock for the date and the time. A 3 V coin cell on the VBAT pin keeps this clock on when the power is off. The On/Off pin lets a button switch the 3.3 V power.</p>
+    <p>An encoder board does not need the date, the time or a power button.</p>
+  </div>
+  <div class="card x">
+    <h3><span class="num">14</span>LED</h3>
+    <div class="part">Orange LED on pin 13</div>
+    <span class="tag">Not necessary</span>
+    <p>Programs flash this LED to show that they run. The task does not need it.</p>
+    <p>It is useful for tests and it costs very little. You can keep it on a new board if you want a simple indication.</p>
+  </div>
+  <div class="card x">
+    <h3><span class="num">15</span>Memory positions on the bottom</h3>
+    <div class="part">2 empty positions for 8-pin PSRAM or flash chips</div>
+    <span class="tag">Not necessary</span>
+    <p>You can solder more memory here: two RAM chips, or one RAM chip and one flash chip. On a new Teensy the positions are empty.</p>
+    <p>Your project uses a very small quantity of memory. More memory is not necessary.</p>
+  </div>
+</div>
+
+<!-- ───────────── 5. INSIDE THE PROCESSOR ───────────── -->
+<h2><span class="n">SECTION 5</span>Inside the processor</h2>
+<p>Many functions of the Teensy 4.1 are not separate components. They are circuits inside the processor chip. The diagram shows the primary circuits.</p>
+<p>You cannot remove a circuit from a chip. But you can select a smaller chip that does not have the red circuits.</p>
+
+<figure>
+  <div class="chips">
+    <div class="chip">Cortex-M7 core<small>600 MHz. Much more than necessary.</small></div>
+    <div class="chip">RAM, 1 MB<small>Much more than necessary.</small></div>
+    <div class="chip star">Quadrature decoders × 4<small>Count the encoder changes.</small></div>
+    <div class="chip">Input/output pin control<small>Reads A and B.</small></div>
+    <div class="chip">USB device port<small>Speaks to the computer.</small></div>
+    <div class="chip">Flash interface<small>Reads the program.</small></div>
+    <div class="chip">Timers<small>Control when to send data.</small></div>
+    <div class="chip">Clock and power control<small>Includes the core converter.</small></div>
+    <div class="chip x">USB host port<small>For devices that connect to the board.</small></div>
+    <div class="chip x">Ethernet controller<small>10/100 Mbit network.</small></div>
+    <div class="chip x">CAN bus × 3<small>Vehicle and machine networks.</small></div>
+    <div class="chip x">Digital audio<small>I2S × 2, S/PDIF.</small></div>
+    <div class="chip x">Analog inputs × 18<small>Measure voltages.</small></div>
+    <div class="chip x">PWM outputs × 35<small>Motors and LED brightness.</small></div>
+    <div class="chip x">Serial × 8, SPI × 3, I2C × 3<small>Connections to other chips.</small></div>
+    <div class="chip x">SD card interface<small>For the microSD socket.</small></div>
+    <div class="chip x">Date and time clock<small>Uses the 32.768 kHz crystal.</small></div>
+    <div class="chip x">Floating-point unit<small>Fast decimal mathematics.</small></div>
+    <div class="chip x">FlexIO and pixel pipeline<small>Displays and cameras.</small></div>
+    <div class="chip x">Cryptography<small>Includes random numbers.</small></div>
+  </div>
+  <figcaption>The circuit with the thick outline does the primary work of your project.</figcaption>
+</figure>
+
+<div class="note">
+  <p>The four quadrature decoders count the changes with no work for the program. They operate on specified pins only. If you have more than four encoders, the program can count the changes itself on any pin. The Teensy software has a library for each method.</p>
+</div>
+
+<!-- ───────────── 6. POWER ───────────── -->
+<h2><span class="n">SECTION 6</span>How the power moves</h2>
+<p>The board gets 5 V from the USB cable and changes it into the voltages that each part needs. Three power paths go to parts that your project does not use.</p>
+
+<figure>
+  <div class="wide">
+  <svg viewBox="0 0 980 290" role="img" aria-label="Power distribution on the Teensy 4.1">
+    <rect class="c" x="20" y="30" width="130" height="46" rx="4"/><text class="t" x="85" y="50">USB cable</text><text class="t" x="85" y="65">5 V</text>
+    <line class="w" x1="150" y1="53" x2="187" y2="53" marker-end="url(#ah)"/>
+    <rect class="c" x="190" y="30" width="70" height="46" rx="4"/><text class="t" x="225" y="57">Fuse</text>
+    <line class="w" x1="260" y1="53" x2="307" y2="53" marker-end="url(#ah)"/>
+    <rect class="c" x="310" y="30" width="150" height="46" rx="4"/><text class="t" x="385" y="50">Regulator</text><text class="t" x="385" y="65">5 V → 3.3 V</text>
+    <line class="w" x1="460" y1="53" x2="527" y2="53" marker-end="url(#ah)"/>
+    <rect class="c" x="530" y="30" width="200" height="46" rx="4"/><text class="t" x="630" y="50">Converter in the processor</text><text class="t" x="630" y="65">+ inductor</text>
+    <line class="w" x1="730" y1="53" x2="787" y2="53" marker-end="url(#ah)"/>
+    <rect class="c" x="790" y="30" width="170" height="46" rx="4"/><text class="t" x="875" y="50">Processor core</text><text class="t" x="875" y="65">approx. 1.2 V</text>
+
+    <!-- 3.3 V bus -->
+    <path class="w" d="M385 76V106M360 106H624"/>
+    <path class="w x" d="M624 106H888"/>
+    <line class="w" x1="360" y1="106" x2="360" y2="127" marker-end="url(#ah)"/>
+    <line class="w" x1="492" y1="106" x2="492" y2="127" marker-end="url(#ah)"/>
+    <line class="w" x1="624" y1="106" x2="624" y2="127" marker-end="url(#ah)"/>
+    <line class="w x" x1="756" y1="106" x2="756" y2="127" marker-end="url(#ahr)"/>
+    <line class="w x" x1="888" y1="106" x2="888" y2="127" marker-end="url(#ahr)"/>
+    <text class="sm" x="430" y="98">3.3 V</text>
+    <rect class="c" x="300" y="130" width="120" height="46" rx="4"/><text class="t" x="360" y="150">Processor</text><text class="t" x="360" y="165">pins</text>
+    <rect class="c" x="432" y="130" width="120" height="46" rx="4"/><text class="t" x="492" y="150">Flash</text><text class="t" x="492" y="165">memory</text>
+    <rect class="c" x="564" y="130" width="120" height="46" rx="4"/><text class="t" x="624" y="150">Bootloader</text><text class="t" x="624" y="165">chip</text>
+    <rect class="c x" x="696" y="130" width="120" height="46" rx="4"/><text class="t x" x="756" y="150">Ethernet</text><text class="t x" x="756" y="165">chip</text>
+    <rect class="c x" x="828" y="130" width="120" height="46" rx="4"/><text class="t x" x="888" y="150">microSD</text><text class="t x" x="888" y="165">card</text>
+
+    <!-- 5 V host branch -->
+    <path class="w x" d="M282 53V243H307" marker-end="url(#ahr)"/>
+    <text class="sm x" x="262" y="200">5 V</text>
+    <rect class="c x" x="310" y="220" width="170" height="46" rx="4"/><text class="t x" x="395" y="240">USB host</text><text class="t x" x="395" y="255">power switch</text>
+    <line class="w x" x1="480" y1="243" x2="517" y2="243" marker-end="url(#ahr)"/>
+    <rect class="c x" x="520" y="220" width="120" height="46" rx="4"/><text class="t x" x="580" y="240">USB host</text><text class="t x" x="580" y="255">port</text>
+
+    <!-- VBAT -->
+    <rect class="c x" x="696" y="220" width="110" height="46" rx="4"/><text class="t x" x="751" y="240">Coin cell</text><text class="t x" x="751" y="255">on VBAT</text>
+    <line class="w x" x1="806" y1="243" x2="835" y2="243" marker-end="url(#ahr)"/>
+    <rect class="c x" x="838" y="220" width="110" height="46" rx="4"/><text class="t x" x="893" y="240">Date and</text><text class="t x" x="893" y="255">time clock</text>
+  </svg>
+  </div>
+  <figcaption>Black paths are necessary. Red paths supply the components from Section 4.</figcaption>
+</figure>
+
+<!-- ───────────── 7. NEW BOARD ───────────── -->
+<h2><span class="n">SECTION 7</span>A new board for this project only</h2>
+<p>There are two methods to make the new board.</p>
+
+<h3>Method 1: Keep the processor and remove the red parts</h3>
+<p>The board keeps components 1 to 8. It works with the Teensy software and your program does not change.</p>
+<p>But this method is difficult. The processor has 196 contacts below the chip, and you cannot solder them by hand. The processor is also much more powerful than the task needs.</p>
+
+<h3>Method 2: Use a smaller processor</h3>
+<p>This is the usual method for a board with one task. A small microcontroller with USB can read many encoders easily. Examples are the ATmega32U4, the RP2040 and the small STM32 chips with USB.</p>
+<p>With a small microcontroller, the board becomes very simple:</p>
+
+<figure>
+  <svg viewBox="0 0 620 230" role="img" aria-label="Block layout of a minimum encoder board">
+    <rect class="brd" x="60" y="30" width="500" height="170" rx="8"/>
+    <rect class="c" x="36" y="88" width="66" height="54" rx="4"/><text class="t" x="69" y="119">USB</text>
+    <rect class="c" x="130" y="48" width="70" height="34" rx="2"/><text class="t" x="165" y="69">Regulator</text>
+    <rect class="c" x="130" y="150" width="34" height="34" rx="3"/><circle class="c" cx="147" cy="167" r="9"/>
+    <text class="sm" x="147" y="143">Button</text>
+    <rect class="c" x="196" y="154" width="50" height="24" rx="8"/><text class="sm" x="221" y="170" style="fill:#1d1c1a">Crystal</text>
+    <rect class="c" x="262" y="68" width="100" height="100" rx="3"/>
+    <text class="t" x="312" y="108">Small</text><text class="t" x="312" y="123">processor</text><text class="t" x="312" y="138">with USB</text>
+    <g>
+      <circle class="pin" cx="430" cy="62" r="7"/><circle class="pin" cx="452" cy="62" r="7"/><circle class="pin" cx="474" cy="62" r="7"/>
+      <circle class="pin" cx="430" cy="98" r="7"/><circle class="pin" cx="452" cy="98" r="7"/><circle class="pin" cx="474" cy="98" r="7"/>
+      <circle class="pin" cx="430" cy="134" r="7"/><circle class="pin" cx="452" cy="134" r="7"/><circle class="pin" cx="474" cy="134" r="7"/>
+      <circle class="pin" cx="430" cy="170" r="7"/><circle class="pin" cx="452" cy="170" r="7"/><circle class="pin" cx="474" cy="170" r="7"/>
+    </g>
+    <g class="sm" style="text-anchor:start;fill:#1d1c1a">
+      <text x="490" y="65">Encoder 1</text><text x="490" y="101">Encoder 2</text><text x="490" y="137">Encoder 3</text><text x="490" y="173">Encoder 4</text>
+    </g>
+    <text class="sm" x="452" y="218">A · GND · B</text>
+  </svg>
+  <figcaption>A minimum board for four encoders. Capacitors and resistors are not shown.</figcaption>
+</figure>
+
+<ul class="plain">
+  <li>One small microcontroller with USB.</li>
+  <li>One USB connector.</li>
+  <li>One regulator. Some chips operate directly from 5 V and do not need it.</li>
+  <li>One crystal. Some chips have an accurate internal clock and do not need it.</li>
+  <li>One flash chip, but only if the microcontroller has no internal program memory.</li>
+  <li>One button for program mode.</li>
+  <li>One 3-pin connector for each encoder.</li>
+  <li>A small number of capacitors and resistors.</li>
+</ul>
+<p>The chips above are examples, not a final selection. Make the selection from the number of encoders and from the software that you want to use. The program from your Teensy will need changes for a different chip.</p>
+
+<footer>
+  <p>The maps on this page are simplified drawings. They show which components are on the board, not their accurate positions. For accurate data, refer to the <a href="https://www.pjrc.com/store/teensy41.html">PJRC Teensy 4.1 page</a> and its schematic.</p>
+</footer>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var g = document.getElementById('pins');
+  function range(a, b) { var r = [], s = a < b ? 1 : -1; for (var i = a; i !== b + s; i += s) r.push(String(i)); return r; }
+  var top = ['VIN', 'G', '3V'].concat(range(23, 13), ['G'], range(41, 33));
+  var bottom = ['G'].concat(range(0, 12), ['3V'], range(24, 32));
+  function row(names, y, labelY, keep) {
+    names.forEach(function (n, i) {
+      var x = 58.75 + i * 37.5, used = keep(i);
+      var c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 9);
+      c.setAttribute('class', used ? 'pin' : 'pin x');
+      var t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', x); t.setAttribute('y', labelY);
+      t.setAttribute('class', used ? 'sm' : 'sm x');
+      t.textContent = n;
+      g.appendChild(c); g.appendChild(t);
+    });
+  }
+  row(top, 70, 93, function () { return false; });
+  row(bottom, 280, 264, function (i) { return i <= 8; });
+  document.getElementById('strip').addEventListener('change', function (e) {
+    document.body.classList.toggle('strip', e.target.checked);
+  });
+})();
+</script>
+</body>
+</html>
